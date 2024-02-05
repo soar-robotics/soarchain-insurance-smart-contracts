@@ -1,0 +1,1 @@
+# Soarchain Custom CosmWasm Contract
