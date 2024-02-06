@@ -14,7 +14,7 @@ This repository is designed to cover the entire lifecycle of insurance policies,
 
 ### Insurance Workflow
 ##
-The workflow of issuance and renewal of vehicle insurance based on a blockchain network involves multiple steps to ensure transparency, security, and efficiency. Below is a general outline of the 3 workflow:
+The workflow of issuance and renewal of vehicle insurance based on a blockchain network involves multiple steps to ensure transparency, security, and efficiency. Below is a general outline of the workflow:
 ##
 **User Registration**
 
