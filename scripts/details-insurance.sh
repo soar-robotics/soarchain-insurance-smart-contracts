@@ -1,7 +1,8 @@
 #!/bin/sh
 
-ID=$1
+CONTRACT_ADDRESS=$1
+ID=$2
 
-$CHAIN query wasm contract-state smart $Insurance_CONTRACT_ADDRESS '{"details":{"id":"'"$ID"'"}}' \
+$CHAIN query wasm contract-state smart $CONTRACT_ADDRESS '{"details":{"id":"'"$ID"'"}}' \
     --node $NODE \
     --chain-id $CHAINID 

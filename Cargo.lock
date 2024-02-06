@@ -408,23 +408,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "insurance"
-version = "0.7.0"
-dependencies = [
- "anyhow",
- "cosmwasm-schema",
- "cosmwasm-std",
- "cosmwasm-storage",
- "cw-storage-plus",
- "cw2",
- "itertools",
- "log",
- "schemars",
- "serde",
- "thiserror",
-]
-
-[[package]]
 name = "itertools"
 version = "0.10.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -479,6 +462,7 @@ dependencies = [
  "log",
  "schemars",
  "serde",
+ "serde_json",
  "thiserror",
 ]
 
@@ -738,6 +722,23 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.48",
+]
+
+[[package]]
+name = "traditional"
+version = "0.7.0"
+dependencies = [
+ "anyhow",
+ "cosmwasm-schema",
+ "cosmwasm-std",
+ "cosmwasm-storage",
+ "cw-storage-plus",
+ "cw2",
+ "itertools",
+ "log",
+ "schemars",
+ "serde",
+ "thiserror",
 ]
 
 [[package]]
