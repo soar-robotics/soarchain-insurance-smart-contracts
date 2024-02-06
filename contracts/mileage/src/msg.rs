@@ -19,12 +19,28 @@ pub struct InstantiateMsg {
 pub enum ExecuteMsg {
     CreatePolicy(InsurancePolicyData),
     Withdraw(WithdrawMsg),
-    Close{insured_party:String},
+    Renewal(RenewalMsg),
+    Terminate(TerminateMsg),
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct WithdrawMsg {
-    pub policy_holder: String,
+    pub id: String,
+    pub insured_party: String,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+pub struct RenewalMsg {
+    pub id: String,
+    pub premium: u64,
+    pub duration: u64,
+    pub coverage: String,
+    pub insured_party: String,
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
+pub struct TerminateMsg {
+    pub id: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
@@ -64,11 +80,13 @@ pub struct DetailsResponse {
     pub id: String,
     pub policy_holder: String,
     pub insured_party: String,
-    pub creation_date: u64,
+    pub start_date: u64,
     pub beneficiary: String,
     pub coverage: String,
     pub plan: String,
     pub premium: u64,
-    pub period: u64,
+    pub duration: u64,
+    pub termination_date: u64,
+    pub is_active: bool,
     pub closed: bool,
 }

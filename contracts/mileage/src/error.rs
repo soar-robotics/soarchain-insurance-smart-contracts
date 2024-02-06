@@ -24,4 +24,16 @@ pub enum ContractError {
     #[error("Missing Data. Data must have at least two elements")]
     NoData {},
 
+    #[error("Unauthorized. Ensure that the sender is the insured of the contract")]
+    UnauthorizedInsuredParty {},
+
+    #[error("Policy is active. Active policy can not be terminated")]
+    Active {},
+
+    #[error("Policy is not active. In Active policy can not be renewal")]
+    NoActive {},
+
+    #[error("Policy Not Find.")]
+    PolicyNotFound {},
+
 }

@@ -5,7 +5,7 @@ use cosmwasm_std::{
 use log::info;
 use cw2::set_contract_version;
 use crate::error::ContractError;
-use crate::msg::{DetailsResponse, ExecuteMsg, InstantiateMsg, InsurancePolicyData, MotusByAddressResponse, PaymentVerificationResponse, QueryMsg, WithdrawMsg};
+use crate::msg::{DetailsResponse, ExecuteMsg, InstantiateMsg, InsurancePolicyData, MotusByAddressResponse, PaymentVerificationResponse, QueryMsg, RenewalMsg, TerminateMsg, WithdrawMsg};
 use crate::policy::Policy;
 use crate::state::{State, POLICES, STATE};
 use crate::querier::SoarchainQuerier;
@@ -13,7 +13,7 @@ use crate::query::SoarchainQuery;
 use cosmwasm_std::{
     coin, to_json_binary, BalanceResponse, BankMsg, BankQuery, Binary, StdResult
 };
-use crate::utils::calculate_mileage;
+use crate::utils::{calculate_mileage, calculate_renewal_termination_date, calculate_termination_date};
 
 // Version info for migration
 const CONTRACT_NAME: &str = "crates.io:mileage-contract";
@@ -29,7 +29,7 @@ pub fn instantiate(
 
     // Create the initial state for the contract
     let state = State {
-        policy_holder: msg.policy_holder.to_string(),
+        policy_holder: info.sender.to_string(),
         insured_party: msg.insured_party.to_string(),
         denom: msg.denom,
         base_rate: msg.base_rate,
@@ -44,8 +44,8 @@ pub fn instantiate(
     // Return a success response with relevant attributes
     Ok(Response::new()
         .add_attribute("method", "instantiate")
-        .add_attribute("owner", info.sender)
-        .add_attribute("motus_owner", msg.insured_party))
+        .add_attribute("policy_holder", info.sender)
+        .add_attribute("insured_party", msg.insured_party))
 }
 
 #[cfg_attr(not(feature = "library"), entry_point)]
@@ -58,13 +58,14 @@ pub fn execute(
     match msg {
         ExecuteMsg::CreatePolicy(msg) => create_mileage_based_policy(deps, env, msg, info ),
         ExecuteMsg::Withdraw(msg)  => execute_withdraw(deps, env, info, msg),
-        ExecuteMsg::Close{insured_party} => execute_close(deps, env, insured_party, info),
+        ExecuteMsg::Renewal(msg) => execute_renewal(deps, env, info, msg),
+        ExecuteMsg::Terminate(msg) => execute_terminate(deps, env, info, msg),
     }
 }
 
 pub fn create_mileage_based_policy(
     deps: DepsMut,
-    env: Env,
+    _env: Env,
     msg: InsurancePolicyData,
     _info: MessageInfo,
 ) -> Result<Response, ContractError> {
@@ -74,7 +75,7 @@ pub fn create_mileage_based_policy(
 
     // Ensure that the sender is the owner of the contract
     let state = STATE.load(deps.storage)?;
-    if state.policy_holder != msg.policy.policy_holder {
+    if state.policy_holder.to_string() != msg.policy.policy_holder.to_string() {
         return Err(ContractError::Unauthorized {});
     }
 
@@ -82,21 +83,33 @@ pub fn create_mileage_based_policy(
         return Err(ContractError::NoData {});
     }
 
-    let mile = calculate_mileage(&msg.data);
+    let mileage = calculate_mileage(&msg.data);
 
-    // Calculate the insurance premium based on miles driven
-    let premium = state.base_rate + (mile * state.rate_per_mile);
+
+    // TODO: Insert your specific business logic calculations in this section.
+
+    // Guidence:
+    // Premium = Rate × Mileage
+    // The formula provided serves as a basic illustration of the relationship between rate, mileage, and premium.
+    // Insurance companies may use more complex formulas, taking into account various factors such
+    // as the type of coverage, the insured vehicle's characteristics, the driver's history OR using the range for premium.
+    // For example for mileage > 15000 not discount
+    let premium = state.base_rate * (mileage * state.rate_per_mile);
+
+    let termination_time = calculate_termination_date(msg.policy.start_date, msg.policy.duration);
 
     let policy = Policy::create(
         msg.policy.id.to_string(),
         policy_holder.to_string(),
         insured_party.to_string(),
-        env.block.time.seconds().into(),
+        msg.policy.start_date,
         msg.policy.beneficiary,
         msg.policy.coverage,
         msg.policy.plan,
         premium,
-        msg.policy.period,
+        msg.policy.duration,
+        termination_time,
+        false,
         false,
     )?;
 
@@ -111,25 +124,38 @@ pub fn create_mileage_based_policy(
 
 pub fn execute_withdraw(
     deps: DepsMut,
-    _env: Env,
+    env: Env,
     _info: MessageInfo,
     msg: WithdrawMsg,
 ) -> Result<Response, ContractError> {
 
     let state = STATE.load(deps.storage)?;
 
-    let policy = POLICES.load(deps.storage, &msg.policy_holder)?;
+    let policy = POLICES.load(deps.storage, &msg.id)?;
     let withdraw_amount: u128 = policy.premium as u128;
 
+    let balance = deps.querier.query_balance(env.contract.address.to_string(), state.denom.to_string())?;
+
     // Ensure the sender has enough funds to transfer
-    if withdraw_amount.eq(&0) {
+    if withdraw_amount.eq(&0) || balance.amount.u128() < withdraw_amount {
         return Result::Err(ContractError::ZeroAmount {});
     }
 
     if policy.closed {
         return Err(ContractError::Closed {});
     }
-    POLICES.save(deps.storage, &msg.policy_holder, &policy)?;
+
+    POLICES.update(deps.storage, &msg.id, |existing| {
+        if let Some(mut res) = existing {
+            // Modify the existing policy fields as needed
+            res.is_active = true;
+            // Add more fields if needed
+    
+            Ok(res)
+        } else {
+            Err(ContractError::PolicyNotFound {})
+        }
+    })?;
 
     let msg = BankMsg::Send {
         to_address: policy.policy_holder.to_string(),
@@ -139,44 +165,112 @@ pub fn execute_withdraw(
     let res = Response::new()
         .add_attribute("action", "withdraw")
         .add_attribute("to", policy.policy_holder)
-        .add_attribute("amount", withdraw_amount.to_string())
+        .add_attribute("withdraw_amount", withdraw_amount.to_string())
         .add_message(msg);
     Ok(res)
 }
 
-pub fn execute_close(
+pub fn execute_renewal(
     deps: DepsMut,
-    _env: Env,
-    motus_owner: String,
-    info: MessageInfo,
+    env: Env,
+    _info: MessageInfo,
+    msg: RenewalMsg,
 ) -> Result<Response, ContractError> {
 
-    let mut policy = POLICES.load(deps.storage, &motus_owner)?;
-
-    if policy.closed {
-        return Err(ContractError::Closed {  });
-    }
-
-    // Ensure that the sender is the owner of the contract
-    if info.sender != policy.policy_holder {
-        return Err(ContractError::InvalidUser { });
-    }
-
-    policy.closed = true;
-    
-    POLICES.save(deps.storage, &motus_owner, &policy)?;
-
-    let withdraw_amount: u128 = policy.premium as u128;
     let state = STATE.load(deps.storage)?;
 
-    let msg = BankMsg::Send {
-        to_address: policy.insured_party.to_string(),
-        amount: vec![coin(withdraw_amount, state.denom.to_string())],
+    // Ensure that the sender is the insured of the contract
+    if state.insured_party.to_string() != msg.insured_party.to_string() {
+        return Err(ContractError::UnauthorizedInsuredParty {});
+    }
+
+    let policy = POLICES.load(deps.storage, &msg.id)?;
+    let renewal_premium: u128 = msg.premium as u128;
+
+    let balance = deps.querier.query_balance(env.contract.address.to_string(), state.denom.to_string())?;
+
+    // Ensure the sender has enough funds to transfer
+    if renewal_premium.eq(&0) || balance.amount.u128() < renewal_premium {
+        return Result::Err(ContractError::ZeroAmount {});
+    }
+
+    if policy.closed {
+        return Err(ContractError::Closed {});
+    }
+
+    if !policy.is_active {
+        return Err(ContractError::NoActive {});
+    }
+
+    let termination_time = calculate_renewal_termination_date(policy.duration, policy.termination_date);
+
+    POLICES.update(deps.storage, &msg.id, |existing| {
+        if let Some(mut res) = existing {
+            // Modify the existing policy fields as needed
+            //res.coverage = msg.coverage;
+            res.premium= msg.premium;
+            res.duration = msg.duration;
+            res.termination_date= termination_time;
+            // Add more fields if needed
+    
+            Ok(res)
+        } else {
+            Err(ContractError::PolicyNotFound {})
+        }
+    })?;
+
+    let bank_msg = BankMsg::Send {
+        to_address: policy.policy_holder.to_string(),
+        amount: vec![coin(renewal_premium, state.denom.to_string())],
     };
 
     let res = Response::new()
-        .add_attribute("action", "close")
-        .add_message(msg);
+        .add_attribute("action", "withdraw")
+        .add_attribute("to", state.policy_holder)
+        .add_attribute("renewal_premium", renewal_premium.to_string())
+        .add_message(bank_msg);
+    Ok(res)
+}
+
+pub fn execute_terminate(
+    deps: DepsMut,
+    _env: Env,
+    info: MessageInfo,
+    msg: TerminateMsg,
+) -> Result<Response, ContractError> {
+
+    // let state = STATE.load(deps.storage)?;
+    let policy = POLICES.load(deps.storage, &msg.id)?;
+
+    if policy.closed {
+        return Err(ContractError::Closed {});
+    }
+
+    // Ensure that the sender is the owner of the contract
+    if info.sender.to_string() != policy.policy_holder.to_string() {
+        return Err(ContractError::InvalidUser {});
+    }
+
+    if policy.is_active {
+        return Err(ContractError::Active {});
+    }
+
+    POLICES.update(deps.storage, &msg.id, |existing| {
+        if let Some(mut res) = existing {
+            // Modify the existing policy fields as needed
+            res.is_active = false;
+            res.closed= true;
+            // Add more fields if needed
+    
+            Ok(res)
+        } else {
+            Err(ContractError::PolicyNotFound {})
+        }
+    })?;
+    
+
+    let res = Response::new()
+        .add_attribute("action", "terminate");
     Ok(res)
 }
 
@@ -227,12 +321,14 @@ fn query_details(deps: Deps<SoarchainQuery>, id: String) -> StdResult<DetailsRes
         id,
         policy_holder: policy.policy_holder,
         insured_party: policy.insured_party,
-        creation_date: policy.creation_date,
+        start_date: policy.start_date,
         beneficiary: policy.beneficiary,
         coverage: policy.coverage,
         plan: policy.plan,
         premium: policy.premium,
-        period: policy.period,
+        duration: policy.duration,
+        termination_date: policy.termination_date,
+        is_active: policy.is_active,
         closed: policy.closed
     };
 
