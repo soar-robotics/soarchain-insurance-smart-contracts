@@ -50,7 +50,7 @@ pub fn instantiate(
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn execute(
-    deps: DepsMut,
+    deps: DepsMut<SoarchainQuery>,
     env: Env,
     info: MessageInfo,
     msg: ExecuteMsg,
@@ -64,7 +64,7 @@ pub fn execute(
 }
 
 pub fn create_mileage_based_policy(
-    deps: DepsMut,
+    deps: DepsMut<SoarchainQuery>,
     _env: Env,
     msg: InsurancePolicyData,
     _info: MessageInfo,
@@ -83,17 +83,27 @@ pub fn create_mileage_based_policy(
         return Err(ContractError::NoData {});
     }
 
+    // Verify that the insured party is registered as a motus client within the blockchain.
+    let querier = SoarchainQuerier::new(&deps.querier);
+    let response = querier.motus_by_address(state.insured_party).unwrap();
+    if response.address != msg.policy.insured_party {
+        return Err(ContractError::Unauthorized {});
+    }
+
     let mileage = calculate_mileage(&msg.data);
 
 
-    // TODO: Insert your specific business logic calculations in this section.
+    /* TODO: <<Insert your specific business logic calculations in this section.>> */
+    
+    /* 
+     * Guidence:
+     * Premium = Rate × Mileage
+     * The formula provided serves as a basic illustration of the relationship between rate, mileage, and premium.
+     * Insurance companies may use more complex formulas, taking into account various factors such
+     * as the type of coverage, the insured vehicle's characteristics, the driver's history OR using the range for premium.
+     * For example for mileage > 15000 not discount
+     */
 
-    // Guidence:
-    // Premium = Rate × Mileage
-    // The formula provided serves as a basic illustration of the relationship between rate, mileage, and premium.
-    // Insurance companies may use more complex formulas, taking into account various factors such
-    // as the type of coverage, the insured vehicle's characteristics, the driver's history OR using the range for premium.
-    // For example for mileage > 15000 not discount
     let premium = state.base_rate * (mileage * state.rate_per_mile);
 
     let termination_time = calculate_termination_date(msg.policy.start_date, msg.policy.duration);
@@ -123,7 +133,7 @@ pub fn create_mileage_based_policy(
 }
 
 pub fn execute_withdraw(
-    deps: DepsMut,
+    deps: DepsMut<SoarchainQuery>,
     env: Env,
     _info: MessageInfo,
     msg: WithdrawMsg,
@@ -171,7 +181,7 @@ pub fn execute_withdraw(
 }
 
 pub fn execute_renewal(
-    deps: DepsMut,
+    deps: DepsMut<SoarchainQuery>,
     env: Env,
     _info: MessageInfo,
     msg: RenewalMsg,
@@ -233,7 +243,7 @@ pub fn execute_renewal(
 }
 
 pub fn execute_terminate(
-    deps: DepsMut,
+    deps: DepsMut<SoarchainQuery>,
     _env: Env,
     info: MessageInfo,
     msg: TerminateMsg,

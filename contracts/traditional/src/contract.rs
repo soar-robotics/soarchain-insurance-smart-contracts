@@ -50,7 +50,7 @@ pub fn instantiate(
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn execute(
-    deps: DepsMut,
+    deps: DepsMut<SoarchainQuery>,
     env: Env,
     info: MessageInfo,
     msg: ExecuteMsg,
@@ -64,7 +64,7 @@ pub fn execute(
 }
 
 pub fn create_policy(
-    deps: DepsMut,
+    deps: DepsMut<SoarchainQuery>,
     _env: Env,
     msg: Policy,
     _info: MessageInfo,
@@ -80,15 +80,23 @@ pub fn create_policy(
     }
 
     // Verify that the insured party is registered as a motus client within the blockchain.
-    // let querier = SoarchainQuerier::new(&querier_deps.querier);
-    // let response = querier.motus_by_address(state.insured_party).unwrap();
-    // if response.address != msg.insured_party {
-    //     return Err(ContractError::Unauthorized {});
-    // }
+    let querier = SoarchainQuerier::new(&deps.querier);
+    let response = querier.motus_by_address(state.insured_party).unwrap();
+    if response.address != msg.insured_party {
+        return Err(ContractError::Unauthorized {});
+    }
 
-
-    // TODO: Insert your specific business logic checks in this section.
+    /* TODO: <<Insert your specific business logic calculations in this section.>> */
     
+    /* 
+     * Guidence:
+     * The formula provided serves as a basic illustration of the relationship between objects and data.
+     * Insurance companies may use more complex formulas, taking into account various factors such
+     * as the type of coverage, the insured vehicle's characteristics, the driver's history OR using the range for premium.
+     */
+
+    
+
     let termination_time = calculate_termination_date(msg.start_date, msg.duration);
 
     println!("Result of termination_date: {}", termination_time);
@@ -118,7 +126,7 @@ false,
 }
 
 pub fn execute_withdraw_premium(
-    deps: DepsMut,
+    deps: DepsMut<SoarchainQuery>,
     env: Env,
     _info: MessageInfo,
     msg: WithdrawMsg,
@@ -171,7 +179,7 @@ pub fn execute_withdraw_premium(
 }
 
 pub fn execute_renewal(
-    deps: DepsMut,
+    deps: DepsMut<SoarchainQuery>,
     env: Env,
     _info: MessageInfo,
     msg: RenewalMsg,
@@ -233,7 +241,7 @@ pub fn execute_renewal(
 }
 
 pub fn execute_terminate(
-    deps: DepsMut,
+    deps: DepsMut<SoarchainQuery>,
     _env: Env,
     info: MessageInfo,
     msg: TerminateMsg,

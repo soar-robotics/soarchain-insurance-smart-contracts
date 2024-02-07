@@ -50,7 +50,7 @@ pub fn instantiate(
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn execute(
-    deps: DepsMut,
+    deps: DepsMut<SoarchainQuery>,
     env: Env,
     info: MessageInfo,
     msg: ExecuteMsg,
@@ -64,23 +64,42 @@ pub fn execute(
 }
 
 pub fn create_usage_based_policy(
-    deps: DepsMut,
+    deps: DepsMut<SoarchainQuery>,
     env: Env,
     msg: InsurancePolicyData,
-    info: MessageInfo,
+    _info: MessageInfo,
 ) -> Result<Response, ContractError> {
   
     let policy_holder = deps.api.addr_validate(&msg.policy.policy_holder)?;
     let insured_party = deps.api.addr_validate(&msg.policy.insured_party)?;
 
     // Ensure that the sender is the owner of the contract
-    if info.sender.to_string() != msg.policy.policy_holder.to_string() {
+    let state = STATE.load(deps.storage)?;
+    if state.policy_holder.to_string() != msg.policy.policy_holder.to_string() {
+        return Err(ContractError::Unauthorized {});
+    }
+
+    // Verify that the insured party is registered as a motus client within the blockchain.
+    let querier = SoarchainQuerier::new(&deps.querier);
+    let response = querier.motus_by_address(state.insured_party).unwrap();
+    if response.address != msg.policy.insured_party {
         return Err(ContractError::Unauthorized {});
     }
 
     if msg.data.len() < 2 {
         return Err(ContractError::NoData {});
     }
+
+    /* TODO: <<Insert your specific business logic calculations in this section.>> */
+    
+    /* 
+     * Guidence:
+     * Premium = Avg_Vss & Avg_Rpt & mileage
+     * The formula provided serves as a basic illustration of the relationship between rate, mileage, and premium.
+     * Insurance companies may use more complex formulas, taking into account various factors such
+     * as the type of coverage, the insured vehicle's characteristics, the driver's history OR using the range for premium.
+     * For example for Avg_Vss < 80 includes 50% discount
+     */
 
     let mut premium = 0;
 
@@ -116,7 +135,7 @@ pub fn create_usage_based_policy(
 }
 
 pub fn execute_withdraw(
-    deps: DepsMut,
+    deps: DepsMut<SoarchainQuery>,
     env: Env,
     _info: MessageInfo,
     msg: WithdrawMsg,
@@ -164,7 +183,7 @@ pub fn execute_withdraw(
 }
 
 pub fn execute_renewal(
-    deps: DepsMut,
+    deps: DepsMut<SoarchainQuery>,
     env: Env,
     _info: MessageInfo,
     msg: RenewalMsg,
@@ -226,7 +245,7 @@ pub fn execute_renewal(
 }
 
 pub fn execute_terminate(
-    deps: DepsMut,
+    deps: DepsMut<SoarchainQuery>,
     _env: Env,
     info: MessageInfo,
     msg: TerminateMsg,
