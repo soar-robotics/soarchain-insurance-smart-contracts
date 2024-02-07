@@ -20,6 +20,7 @@ SCRIPTS := ./scripts/compile-insurance.sh \
 		   ./scripts/renewal-policy.sh \
 		   ./scripts/terminate-policy.sh \
 		   ./scripts/add-key.sh \
+		   ./scripts/details-motus-profile.sh \
 
 # Target to make all script files executable
 make-scripts-executable:
@@ -37,8 +38,8 @@ export CHAIN = soarchaind
 export NODE = http://localhost:26657
 export CHAINID = soarchaindevnet
 export DENOM = udmotus
-export POLICYHOLDER = runner
-export INSUREDPARTY = client
+export Allianz = allianz # Insurance company as insurer
+export Bob = bob # Motus client which is already registered as insured party
 export CONTRACT_PATH="./artifacts/insurance.wasm"
 
 ############
@@ -48,8 +49,8 @@ export CONTRACT_PATH="./artifacts/insurance.wasm"
 # export CHAINID = soarchaintestnet
 # export DENOM = utmotus
 # export CHAIN = soarchaind
-# export POLICYHOLDER = holder
-# export InsuredParty = insured
+# export Allianz = allianz
+# export Bob = bob
 
 
 export CODE = 1
@@ -72,7 +73,7 @@ add-keys:
 	./scripts/add-keys.sh
 
 get-balance:
-	./scripts/get-balance.sh $(POLICYHOLDER)
+	./scripts/get-balance.sh $(Allianz)
 
 add-key:
 	./scripts/add-key.sh
@@ -86,12 +87,12 @@ make-payment:
 ## Traditional Insurance Contract ##
 
 deploy-insurance:
-	./scripts/traditional/deploy-insurance.sh $(POLICYHOLDER)
+	./scripts/traditional/deploy-insurance.sh $(Allianz)
 
 # This script initiates various types of contracts.
 # Ensure to update the $(CODE) variable with the address of the latest deployed contract.
 init-insurance:
-	./scripts/init-insurance.sh $(CODE) $(POLICYHOLDER) $(INSUREDPARTY) $(DENOM) $(BASERATE) $(RATEPERMILEAGE) 
+	./scripts/init-insurance.sh $(CODE) $(Allianz) $(Bob) $(BASERATE) $(RATEPERMILEAGE) 
 
 
 # This script initiates traditional types of contracts.
@@ -107,19 +108,21 @@ fetch-contract-address:
 details-insurance:
 	./scripts/details-insurance.sh $(Insurance_CONTRACT_ADDRESS) $(POLICY_ID)
 
+details-motus-profile:
+	./scripts/details-motus-profile.sh $(Insurance_CONTRACT_ADDRESS)
 
 withdraw-premium:
-	./scripts/withdraw-premium.sh  $(POLICY_ID) $(INSUREDPARTY) $(Insurance_CONTRACT_ADDRESS)
+	./scripts/withdraw-premium.sh  $(POLICY_ID) $(Bob) $(Insurance_CONTRACT_ADDRESS)
 
 renewal-policy:
-	./scripts/renewal-policy.sh  $(POLICY_ID) $(INSUREDPARTY) $(Insurance_CONTRACT_ADDRESS)
+	./scripts/renewal-policy.sh  $(POLICY_ID) $(Bob) $(Insurance_CONTRACT_ADDRESS)
 
 
 ################################
 ## Usage Based Smart Contract ##
 
 deploy_usage_based_insurance:
-	./scripts/mileage/deploy-insurance.sh $(POLICYHOLDER)
+	./scripts/mileage/deploy-insurance.sh $(Allianz)
 
 create-usage-based-policy:
 	./scripts/usage/create-policy.sh $(CODE)
@@ -130,7 +133,7 @@ create-usage-based-policy:
 
 
 deploy_mileage_based_insurance:
-	./scripts/mileage/deploy-insurance.sh $(POLICYHOLDER)
+	./scripts/mileage/deploy-insurance.sh $(Allianz)
 
 create-mileage-based-policy:
 	./scripts/mileage/create-policy.sh $(CODE)

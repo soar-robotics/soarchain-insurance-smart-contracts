@@ -1,10 +1,10 @@
 #!/bin/sh
 
-POLICYHOLDER=$1
+ALLIANZ=$1
 
 # Store the smart contract
 $CHAIN tx wasm store "./artifacts/usage.wasm" \
-    --from $POLICYHOLDER \
+    --from $ALLIANZ \
     --node $NODE \
     --chain-id $CHAINID \
     --gas-prices 0.1$DENOM \

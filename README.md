@@ -131,28 +131,28 @@ make add-key
 
 The account names mentioned in the scripts are utilized for testing token transactions.
 
-6) Allianz initiates a token transfer to the designated key
-
-```bash
-make send-token
-```
-
-7) Allianz deploys the smart contract
+6) Allianz deploys the smart contract
 
 ```bash
 make deploy-insurance
 ```
 
-8) Allianz initiates the smart contract
+7) Allianz initiates the smart contract
 
 ```bash
 make init-insurance
 ```
 
-9) Allianz generates a new insurance policy
+8) Allianz generates a new insurance policy
 
 ```bash
 make create-policy
+```
+
+9) Allianz and Bob check the insurance status and policy details
+
+```bash
+make details-insurance
 ```
 
 10) Bob completes the payment using cryptocurrency
@@ -161,13 +161,7 @@ make create-policy
 make withdraw-premium
 ```
 
-11) Allianz and Bob check the insurance status and details
-
-```bash
-make details-insurance
-```
-
-12) Allianz reviews Bob's registration and vehicle information
+11) Allianz reviews Bob's registration and vehicle information
 
 ```bash
 make details-motus-profile
@@ -179,5 +173,4 @@ You can execute the stop script at any time to halt the node
 make stop-node
 ```
 
-In the repository, you'll discover additional scripts designed to streamline various commands, reducing the need for extensive manual efforts. We encourage you to explore and leverage these scripts to simplify interactions with the chain and contracts. Keep your focus on advancing your business while we handle the technical intricacies.
-
+In the repository, you'll discover additional scripts designed to streamline various commands, reducing the need for extensive manual efforts. We encourage you to explore and leverage these scripts to simplify interactions with the chain and contracts. Keep your focus on advancing your business while we handle the technical intricacies

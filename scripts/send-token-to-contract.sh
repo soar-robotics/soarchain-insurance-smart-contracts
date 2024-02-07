@@ -4,7 +4,7 @@
 CONTRACT=$1
 AMOUNT=$2
 
-$CHAIN tx bank send $($CHAIN keys show -a $POLICYHOLDER) $CONTRACT $AMOUNT$DENOM \
+$CHAIN tx bank send $($CHAIN keys show -a $Allianz) $CONTRACT $AMOUNT$DENOM \
     --chain-id $CHAINID \
     --node $NODE \
     --gas-prices 0.1$DENOM \
