@@ -2,7 +2,7 @@ use cosmwasm_schema::{cw_serde, QueryResponses};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use crate::policy::Policy;
+use crate::{policy::Policy, query::Pid};
 
 #[cw_serde]
 pub struct InstantiateMsg {
@@ -61,6 +61,7 @@ pub struct MotusByAddressResponse {
     pub address: String,
     pub pubkey: String,
     pub vin: String,
+    pub pid: Pid
 }
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]

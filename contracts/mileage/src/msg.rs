@@ -3,6 +3,7 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 use crate::policy::Policy;
+use crate::query::Pid;
 use crate::types::Data;
 
 #[cw_serde]
@@ -68,6 +69,7 @@ pub struct MotusByAddressResponse {
     pub address: String,
     pub pubkey: String,
     pub vin: String,
+    pub pid: Pid
 }
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]

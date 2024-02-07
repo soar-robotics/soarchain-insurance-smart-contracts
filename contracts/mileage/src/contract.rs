@@ -304,6 +304,7 @@ fn get_motus_by_address(deps: Deps<SoarchainQuery>, index: String) -> MotusByAdd
         address: response.address,
         pubkey: response.pubkey,
         vin: response.vin,
+        pid: response.pid,
     }
 }
 
