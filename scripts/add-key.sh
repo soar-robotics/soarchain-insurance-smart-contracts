@@ -20,3 +20,13 @@ $CHAIN tx bank send $($CHAIN keys show -a docker_key) $($CHAIN keys show -a $ALL
 sleep 5
 
 $CHAIN q bank balances $($CHAIN keys show -a $ALLIANZ_ACCOUNT)
+
+
+sleep 5
+
+BOB_ACCOUNT="bob"
+MNEMONIC="upset monster witness fiction word web bulb quarter vessel grab connect shop filter slam powder timber discover concert onion together road tissue icon mimic"
+
+$CHAIN keys add $BOB_ACCOUNT --recover <<< $MNEMONIC
+
+$CHAIN q bank balances $($CHAIN keys show -a $BOB_ACCOUNT)
