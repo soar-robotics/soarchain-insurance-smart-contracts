@@ -1,17 +1,14 @@
 #!/bin/sh
 
 CODE=$1
-POLICY_HOLDER=$2
-INSURED_PARTY=$3
-DENOM=$4
-BASERATE=$5
-RATEPERMILEAGE=$6
-
-echo $(soarchaind keys show -a runner)
+ALLIANZ=$2
+BOB=$3
+BASERATE=$4
+RATEPERMILEAGE=$5
 
 INIT='{'\
-'"policy_holder": "'"$(soarchaind keys show -a runner)"'"'\
-,'"insured_party": "'"$(soarchaind keys show -a client)"'"'\
+'"policy_holder": "'"$(soarchaind keys show -a $ALLIANZ)"'"'\
+,'"insured_party": "'"$(soarchaind keys show -a $BOB)"'"'\
 ,'"denom": "'"$DENOM"'"'\
 ,'"base_rate": '"$BASERATE"''\
 ,'"rate_per_mileage": '"$RATEPERMILEAGE"''\
@@ -20,7 +17,7 @@ INIT='{'\
 $CHAIN tx wasm instantiate $CODE "$INIT" \
     --label "SOARCHAIN INSURANCE INIT" \
     --no-admin \
-    --from runner \
+    --from $ALLIANZ \
     --node $NODE \
     --chain-id $CHAINID \
     --gas-prices 0.1$DENOM \

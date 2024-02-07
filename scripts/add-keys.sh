@@ -53,3 +53,5 @@ $CHAIN tx bank send $($CHAIN keys show -a $MASTER_ACCOUNT) $($CHAIN keys show -a
     --gas-adjustment 1.3 \
     -b block \
     -y
+
+

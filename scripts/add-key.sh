@@ -8,7 +8,7 @@ $CHAIN keys add $ALLIANZ_ACCOUNT --recover <<< $MNEMONIC
 
 sleep 5
 
-$CHAIN tx bank send $($CHAIN keys show -a soarMasterAccount) $($CHAIN keys show -a $ALLIANZ_ACCOUNT) 100000000$DENOM \
+$CHAIN tx bank send $($CHAIN keys show -a docker_key) $($CHAIN keys show -a $ALLIANZ_ACCOUNT) 100000000$DENOM \
     --chain-id $CHAINID \
     --node $NODE \
     --gas-prices 0.1$DENOM \
