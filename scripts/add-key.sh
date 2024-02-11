@@ -1,14 +1,19 @@
 #!/bin/bash
 
-ADDRESS="soar18a8u6s7zftzc4w8x7n6hdjfnlxlp7mr02c60tk"
-ALLIANZ_ACCOUNT="allianz"
-MNEMONIC="symbol ticket rocket math fresh wash law win thank scout husband guard aunt road essence magnet artwork check immense talent way lecture august frozen"
+echo "We are going to create an account for you:"
+echo "Enter your account name:"
+read account
+echo "Enter your mnemonic:"
+read mnemonic
 
-$CHAIN keys add $ALLIANZ_ACCOUNT --recover <<< $MNEMONIC
+
+$CHAIN keys add $account --recover <<< $mnemonic
 
 sleep 5
 
-$CHAIN tx bank send $($CHAIN keys show -a challenger) $($CHAIN keys show -a $ALLIANZ_ACCOUNT) 1000000000$DENOM \
+echo "We are going to send some token to your account for doing tests:"
+
+$CHAIN tx bank send "soar1qt8myp9424ng6rv4fwf65u9a0ttfschw5j4sp8" $($CHAIN keys show -a $account) 1000000000$DENOM \
     --chain-id $CHAINID \
     --node $NODE \
     --gas-prices 0.1$DENOM \
@@ -19,14 +24,5 @@ $CHAIN tx bank send $($CHAIN keys show -a challenger) $($CHAIN keys show -a $ALL
 
 sleep 5
 
-$CHAIN q bank balances $($CHAIN keys show -a $ALLIANZ_ACCOUNT)
+$CHAIN q bank balances $($CHAIN keys show -a $account)
 
-
-sleep 5
-
-BOB_ACCOUNT="bob"
-MNEMONIC="upset monster witness fiction word web bulb quarter vessel grab connect shop filter slam powder timber discover concert onion together road tissue icon mimic"
-
-$CHAIN keys add $BOB_ACCOUNT --recover <<< $MNEMONIC
-
-$CHAIN q bank balances $($CHAIN keys show -a $BOB_ACCOUNT)

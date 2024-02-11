@@ -13,15 +13,20 @@ This repository is designed to cover the entire lifecycle of insurance policies,
 **Deploying**, **Initiating**, **Creating Policies**, **Renewing**, and **Terminating** them. It provides thorough documentation and explanations for each transaction, catering to both insurance companies and self-creation business developers.
 
 ### Insurance Workflow
+
 ##
+
 The workflow of issuance and renewal of vehicle insurance based on a blockchain network involves multiple steps to ensure transparency, security, and efficiency. Below is a general outline of the workflow:
+
 ##
+
 **User Registration**
 
 Participants, including insurance companies, insured parties, and various stakeholders, begin their journey on the blockchain network by creating accounts and securing cryptographic key pairs.
 
-**Prerequisites**: 
+**Prerequisites**:
 For insured parties operating as motus drivers, a seamless integration into the soarchain network is essential. This involves a series of steps that each insured party should follow:
+
 * Purchase a Motus Device (Motus mini) - For further details, please visit [Soarchain Shop](https://shop.soarchain.com/)
 * Complete registration by installing the Soarchai mobile app - Additional information is available at [Soarchain Official Website](https://www.soarchain.com/)
 
@@ -63,9 +68,7 @@ Insurance companies may upgrade smart contracts to introduce new features, impro
 
 It's essential to note that the specific steps and features of the workflow can vary based on the blockchain platform, smart contract language, and regulatory requirements. Additionally, security considerations, privacy, and compliance with local laws should be carefully addressed during the development and deployment of insurance-related smart contracts.
 
-
 -----------------------
-
 
 ## Introduction to Technical Aspects
 
@@ -109,13 +112,13 @@ Here, we will walk through the happy case, where Allianzthe created a policy for
 make make-scripts-executable
 ```
 
-3) Allianz compiles all smart contracts
+3) **Optional**: Allianz compiles all smart contracts only if the code has been modified; otherwise, there is no need to compile before proceeding to the 4th step
 
 ```bash
-make compile-insurance
+make compile-contract
 ```
 
-4) Allianz starts the local SoarChain node
+4) Allianz starts the SoarChain node
 
 ```bash
 make start-node
@@ -127,20 +130,20 @@ make start-node
 make add-key
 ```
 
-**Note**: Bob's account has already been created, and a Motus client has been registered for him. You can verify his vehicle information and request related data from us (SoarChain) using the pre-existing queries
+**Note**: Every insurance smart contract at least has 2 parties. One, the insurance company itself and the second, insured party which we call him in this document Bob. Bob is deriver. He registered as a motus owner into the chain. He has an account. This means you'r next step is creating an account for Bob with the mobile app and register a Motus mini. You can verify his vehicle information and request related data from us (SoarChain) using the pre-existing queries
 
 The account names mentioned in the scripts are utilized for testing token transactions.
 
 6) Allianz deploys the smart contract
 
 ```bash
-make deploy-insurance
+make deploy-contract
 ```
 
 7) Allianz initiates the smart contract
 
 ```bash
-make init-insurance
+make init-contract
 ```
 
 8) Allianz generates a new insurance policy
@@ -152,7 +155,7 @@ make create-policy
 9) Allianz and Bob check the insurance status and policy details
 
 ```bash
-make details-insurance
+make detail-policy
 ```
 
 10) Bob completes the payment using cryptocurrency
@@ -164,7 +167,7 @@ make withdraw-premium
 11) Allianz reviews Bob's registration and vehicle information
 
 ```bash
-make details-motus-profile
+make detail-motus
 ```
 
 You can execute the stop script at any time to halt the node
@@ -174,3 +177,9 @@ make stop-node
 ```
 
 In the repository, you'll discover additional scripts designed to streamline various commands, reducing the need for extensive manual efforts. We encourage you to explore and leverage these scripts to simplify interactions with the chain and contracts. Keep your focus on advancing your business while we handle the technical intricacies
+
+## Disclaimer
+
+⚠️ **Smart contracts of this repository has not undergone a security audit. Use it at your own risk.** ⚠️
+
+It's essential to conduct a thorough security audit before deploying any smart contract to a production environment. The absence of an audit does not guarantee the absence of vulnerabilities. If you plan to use this contract in a real-world scenario, consider consulting with security professionals or auditing services

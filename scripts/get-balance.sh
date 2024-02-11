@@ -1,5 +1,7 @@
 #!/bin/sh
 
-RECEIPT=$1
+echo "We are going to fetch balance of an address:"
+echo "Enter the address (account/contract):"
+read account
 
-$CHAIN q bank balances $($CHAIN keys show -a $RECEIPT)
+$CHAIN q bank balances $account

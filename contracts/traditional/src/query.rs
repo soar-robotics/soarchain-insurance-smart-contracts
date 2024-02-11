@@ -1,6 +1,8 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
 use cosmwasm_std::CustomQuery;
 
+use crate::liabilitypolicy::LiabilityPolicy;
+
 #[cw_serde]
 #[derive(QueryResponses)]
 pub enum SoarchainQuery {
@@ -48,15 +50,22 @@ pub struct PaymentVerificationResponse {
 #[cw_serde]
 pub struct DetailsResponse {
     pub id: String,
-    pub policy_holder: String,
+    pub vehicle: String,
+    pub insurance_type: String,
+    pub insurer: String,
     pub insured_party: String,
-    pub start_date: u64,
-    pub beneficiary: String,
-    pub coverage: String,
-    pub plan: String,
+    pub document_hash: String,
+    pub start_time: u64,
+    pub terms: String,
+    pub risk_point: String,
     pub premium: u64,
     pub duration: u64,
-    pub termination_date: u64,
+    pub termination_time: u64,
     pub is_active: bool,
     pub closed: bool,
+}
+#[cw_serde]
+pub struct ListResponse {
+    /// list all registered policies
+    pub policies: Vec<LiabilityPolicy>,
 }

@@ -6,7 +6,7 @@ pub enum ContractError {
     #[error("{0}")]
     Std(#[from] StdError),
 
-    #[error("Unauthorized. Ensure that the sender is the owner of the contract")]
+    #[error("Unauthorized. Ensure that the sender is the owner of the contract.")]
     Unauthorized {},
 
     #[error("Policy is already in use.")]
@@ -27,7 +27,7 @@ pub enum ContractError {
     #[error("No registration for vehicle. Insured Party should be registered as motus client into the chain")]
     NoRegistration {},
 
-    #[error("Unauthorized. Ensure that the sender is the insured of the contract")]
+    #[error("Unauthorized. Insured party did not registered as a motus owner in the chain.")]
     UnauthorizedInsuredParty {},
 
     #[error("Policy is active. Active policy can not be terminated")]
@@ -38,4 +38,10 @@ pub enum ContractError {
 
     #[error("Policy Not Find.")]
     PolicyNotFound {},
+
+    #[error("Termination time can not be less than start time.")]
+    NoLessTermination {},
+
+    #[error("Ploicy is not eligible for renewal.")]
+    NotEligibleForRenewal {},
 }

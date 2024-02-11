@@ -63,6 +63,32 @@ pub fn execute(
     }
 }
 
+
+    /// # Business Logic
+    ///
+    /// This section is intended for the implementation of specific business logic calculations
+    /// that tailor the insurance policy creation process according to your requirements.
+    ///
+    /// ## Guidance
+    ///
+    /// The provided formula is a basic illustration, showcasing the relationship between objects and data.
+    /// Insurance companies often utilize more intricate formulas, considering factors such as:
+    ///
+    /// - The type of coverage requested.
+    /// - Characteristics of the insured vehicle (e.g., make, model, year).
+    /// - Driver's history and risk profile.
+    /// - Premium calculations based on mileage range or other relevant criteria.
+    ///
+    /// Implement your business-specific logic within this section to customize policy creation accordingly.
+    ///
+    /// ```rust
+    /// // Example of custom business logic:
+    /// fn custom_policy_creation_logic(policy: &mut Policy) {
+    ///     // Implement your calculations and modifications to the policy object here.
+    /// }
+    /// ```
+
+
 pub fn create_mileage_based_policy(
     deps: DepsMut<SoarchainQuery>,
     _env: Env,
