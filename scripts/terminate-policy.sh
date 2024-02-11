@@ -1,13 +1,18 @@
 #!/bin/sh
 
-ID=$1
-CONTRACT=$2
+echo "Enter contract address:"
+read contract
+echo "Enter insured party account name:"
+read party
 
-TERMINATE_DATA='{"terminate":{"id": "'"$ID"'"}}'
 
-$CHAIN tx wasm execute $CONTRACT "$TERMINATE_DATA" \
+ADDRESS=$(soarchaind keys show -a  $party)
+
+TERMINATE_DATA='{"terminate":{"insured_party": "'"$ADDRESS"'"}}'
+
+$CHAIN tx wasm execute $contract "$TERMINATE_DATA" \
     --gas-prices 0.025$DENOM \
-    --from $POLICYHOLDER \
+    --from $party \
     --node $NODE \
     --chain-id $CHAINID \
     --gas auto \

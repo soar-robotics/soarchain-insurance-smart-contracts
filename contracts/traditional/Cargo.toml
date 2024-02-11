@@ -44,8 +44,7 @@ thiserror = "1.0"
 log = { version = "0.4", features = ["max_level_debug", "release_max_level_warn"] }
 anyhow = "1"
 itertools = "0.10"
-
-
-
+sha3 = "0.10.8"
+serde_json = "1.0"
 
 [dev-dependencies]

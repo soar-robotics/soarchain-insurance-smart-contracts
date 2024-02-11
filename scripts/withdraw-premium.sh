@@ -1,13 +1,15 @@
 #!/bin/sh
 
-ID=$1
-BOB=$2
-CONTRACT=$3
+echo "We are going to withdraw premium:"
+echo "Enter insured party account name:"
+read account
+echo "Enter contract address:"
+read contract
 
-WITHDRAW_DATA='{"withdraw":{"id": "'"$ID"'", "insured_party": "'"$($CHAIN keys show -a $BOB)"'"}}'
+WITHDRAW_DATA='{"withdraw":{"insured_party": "'"$($CHAIN keys show -a $account)"'"}}'
 
 
-$CHAIN tx bank send $($CHAIN keys show -a $Bob) $CONTRACT 1000000$DENOM \
+$CHAIN tx bank send $($CHAIN keys show -a $account) $contract 1000000$DENOM \
     --chain-id $CHAINID \
     --node $NODE \
     --gas-prices 0.1$DENOM \
@@ -18,13 +20,13 @@ $CHAIN tx bank send $($CHAIN keys show -a $Bob) $CONTRACT 1000000$DENOM \
 
 sleep 5
 
-$CHAIN q bank balances $CONTRACT
+$CHAIN q bank balances $contract
 
 sleep 5
 
-$CHAIN tx wasm execute $CONTRACT "$WITHDRAW_DATA" \
+$CHAIN tx wasm execute $contract "$WITHDRAW_DATA" \
     --gas-prices 0.025$DENOM \
-    --from $BOB \
+    --from $account \
     --node $NODE \
     --chain-id $CHAINID \
     --gas auto \

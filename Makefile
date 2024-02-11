@@ -1,26 +1,30 @@
 # Makefile to make script files executable
 
 # List of script files to make executable
-SCRIPTS := ./scripts/compile-insurance.sh \
+SCRIPTS := ./scripts/compile-contract.sh \
 		   ./scripts/start-node.sh \
 		   ./scripts/stop-node.sh \
-		   ./scripts/init-insurance.sh \
+		   ./scripts/init-contract.sh \
 		   ./scripts/add-keys.sh \
+		   ./scripts/fetch-default-contract-address.sh \
 		   ./scripts/fetch-contract-address.sh \
 		   ./scripts/create-policy.sh \
-		   ./scripts/details-insurance.sh \
-		   ./scripts/fetch-contract-address.sh \
-		   ./scripts/details-insurance.sh \
+		   ./scripts/detail-policy.sh \
 		   ./scripts/mileage/deploy-insurance.sh \
 		   ./scripts/usage/deploy-insurance.sh \
-		   ./scripts/traditional/deploy-insurance.sh \
+		   ./scripts/traditional/create-policy.sh \
+		   ./scripts/traditional/create-default-policy.sh \
+		   ./scripts/traditional/deploy-contract.sh \
+		   ./scripts/traditional/deploy-default-contract.sh  \
 		   ./scripts/get-balance.sh \
 		   ./scripts/withdraw-premium.sh \
 		   ./scripts/send-token-to-contract.sh \
-		   ./scripts/renewal-policy.sh \
+		   ./scripts/renew-policy.sh \
 		   ./scripts/terminate-policy.sh \
 		   ./scripts/add-key.sh \
-		   ./scripts/details-motus-profile.sh \
+		   ./scripts/detail-motus.sh \
+		   ./scripts/list-policy.sh \
+		   ./scripts/init-default-contract.sh
 
 # Target to make all script files executable
 make-scripts-executable:
@@ -58,7 +62,6 @@ export BASERATE = 1
 export RATEPERMILEAGE = 1
 export INSURANCEID = 1
 export Insurance_CONTRACT_ADDRESS = soar14hj2tavq8fpesdwxxcu44rty3hh90vhujrvcmstl4zr3txmfvw9sg0qwca
-export POLICY_ID = 1
 
 #######################
 ## Docker Container ###
@@ -72,50 +75,70 @@ stop-node:
 add-keys:
 	./scripts/add-keys.sh
 
+get-balance-default-account:
+	./scripts/get-balance-default-account.sh $(Allianz)
+
 get-balance:
-	./scripts/get-balance.sh $(Allianz)
+	./scripts/get-balance.sh
 
 add-key:
 	./scripts/add-key.sh
 
-AMOUNT=100000
 make-payment:
-	./scripts/send-token-to-contract.sh $(Insurance_CONTRACT_ADDRESS) $(AMOUNT)
+	./scripts/send-token-to-contract.sh
 
 
 ####################################
 ## Traditional Insurance Contract ##
 
-deploy-insurance:
-	./scripts/traditional/deploy-insurance.sh $(Allianz)
+deploy-default-contract:
+	./scripts/traditional/deploy-default-contract.sh $(Allianz)
+
+deploy-contract:
+	./scripts/traditional/deploy-contract.sh
 
 # This script initiates various types of contracts.
 # Ensure to update the $(CODE) variable with the address of the latest deployed contract.
-init-insurance:
-	./scripts/init-insurance.sh $(CODE) $(Allianz) $(Bob) $(BASERATE) $(RATEPERMILEAGE) 
+init-default-contract:
+	./scripts/init-default-contract.sh $(CODE) $(Allianz)
+
+init-contract:
+	./scripts/init-contract.sh
 
 
 # This script initiates traditional types of contracts.
 # Ensure to update the $(CONTRACT_ADDRESS) & $(POLICY_ID) variables with the id and the address of the latest deployed contract.
+create-default-policy:
+	./scripts/traditional/create-default-policy.sh $(Insurance_CONTRACT_ADDRESS) $(Bob)
+
 create-policy:
-	./scripts/traditional/create-policy.sh $(Insurance_CONTRACT_ADDRESS) $(POLICY_ID)
+	./scripts/traditional/create-policy.sh
+
+fetch-default-contract-address:
+	./scripts/fetch-default-contract-address.sh $(CODE)
 
 fetch-contract-address:
-	./scripts/fetch-contract-address.sh $(CODE)
+	./scripts/fetch-contract-address.sh
 
 # This script query various types of policies.
 # Make sure to update the $(POLICY_ID) variable with the ID of the desired created policy.
-details-insurance:
-	./scripts/details-insurance.sh $(Insurance_CONTRACT_ADDRESS) $(POLICY_ID)
+detail-policy:
+	./scripts/detail-policy.sh
 
-details-motus-profile:
-	./scripts/details-motus-profile.sh $(Insurance_CONTRACT_ADDRESS)
+detail-motus:
+	./scripts/detail-motus.sh
+
+list-Default-policy:
+	./scripts/list-default-policy.sh $(Insurance_CONTRACT_ADDRESS)
+
+list-policy:
+	./scripts/list-policy.sh
 
 withdraw-premium:
-	./scripts/withdraw-premium.sh  $(POLICY_ID) $(Bob) $(Insurance_CONTRACT_ADDRESS)
+	./scripts/withdraw-premium.sh
 
-renewal-policy:
-	./scripts/renewal-policy.sh  $(POLICY_ID) $(Bob) $(Insurance_CONTRACT_ADDRESS)
+renew-policy:
+	./scripts/renew-policy.sh
 
 
 ################################
@@ -148,11 +171,11 @@ create-UBI-policy:
 
 
 terminate-policy:
-	./scripts/terminate-policy.sh $(POLICY_ID) $(Insurance_CONTRACT_ADDRESS)
+	./scripts/terminate-policy.sh $(Bob) $(Insurance_CONTRACT_ADDRESS)
 
 
 ##############################
 ## Pre-Deploy Configuration ##
 
-compile-insurance:
-	./scripts/compile-insurance.sh
+compile-contract:
+	./scripts/compile-contract.sh

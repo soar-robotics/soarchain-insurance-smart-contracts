@@ -2,21 +2,18 @@ use cosmwasm_schema::{cw_serde, QueryResponses};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-use crate::policy::Policy;
+use crate::{inputs::LiabilityPolicyInputs, liabilitypolicy::{RiskPoint, Terms, Vehicle}, query::Pid};
 
 #[cw_serde]
 pub struct InstantiateMsg {
-    pub policy_holder: String,
-    pub insured_party: String,
     pub denom: String,
-    pub base_rate: u64,
-    pub rate_per_mileage: u64,
+    pub insurer: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ExecuteMsg {
-    CreatePolicy(Policy),
+    CreateLiabilityPolicy(LiabilityPolicyInputs),
     Withdraw(WithdrawMsg),
     Renewal(RenewalMsg),
     Terminate(TerminateMsg),
@@ -24,22 +21,19 @@ pub enum ExecuteMsg {
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct WithdrawMsg {
-    pub id: String,
     pub insured_party: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct RenewalMsg {
-    pub id: String,
     pub premium: u64,
     pub duration: u64,
-    pub coverage: String,
     pub insured_party: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct TerminateMsg {
-    pub id: String,
+    pub insured_party: String,
 }
 
 #[cw_serde]
@@ -49,10 +43,13 @@ pub enum QueryMsg {
     MotusByAddress { address: String },
 
     #[returns(PaymentVerificationResponse)]
-    PaymentVerification {},
+    PaymentVerification { id: String },
 
     #[returns(DetailsResponse)]
-    Details { id: String },
+    Details { address: String },
+
+    #[returns(ListResponse)]
+    List {},
 }
 
 // We define a custom struct for each query response
@@ -61,6 +58,7 @@ pub struct MotusByAddressResponse {
     pub address: String,
     pub pubkey: String,
     pub vin: String,
+    pub pid: Pid
 }
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
@@ -71,15 +69,23 @@ pub struct PaymentVerificationResponse {
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
 pub struct DetailsResponse {
     pub id: String,
-    pub policy_holder: String,
+    pub vehicle: Vehicle,
+    pub insurance_type: String,
+    pub insurer: String,
     pub insured_party: String,
-    pub start_date: u64,
-    pub beneficiary: String,
-    pub coverage: String,
-    pub plan: String,
+    pub document_hash: String,
+    pub start_time: u64,
+    pub terms: Terms,
+    pub risk_point: RiskPoint,
     pub premium: u64,
     pub duration: u64,
-    pub termination_date: u64,
+    pub termination_time: u64,
     pub is_active: bool,
     pub closed: bool,
+}
+
+#[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]
+pub struct ListResponse {
+    /// list all registered vehicle owners
+    pub insured_parties: Vec<String>,
 }
