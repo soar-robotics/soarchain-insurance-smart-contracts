@@ -46,6 +46,6 @@ log = { version = "0.4", features = ["max_level_debug", "release_max_level_warn"
 anyhow = "1"
 itertools = "0.10"
 serde_json = "1.0"
-
+sha3 = "0.10.8"
 
 [dev-dependencies]

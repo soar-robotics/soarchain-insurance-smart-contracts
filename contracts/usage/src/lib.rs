@@ -4,6 +4,7 @@ pub mod msg;
 pub mod state;
 pub mod policy;
 pub mod utils;
+pub mod inputs;
 pub mod types;
 mod querier;
 mod query;
