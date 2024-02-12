@@ -36,4 +36,8 @@ pub enum ContractError {
     #[error("Policy Not Find.")]
     PolicyNotFound {},
 
+    #[error("Ploicy is not eligible for renewal.")]
+    NotEligibleForRenewal {},
+
+
 }

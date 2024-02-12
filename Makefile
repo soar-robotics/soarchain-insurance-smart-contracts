@@ -10,8 +10,12 @@ SCRIPTS := ./scripts/compile-contract.sh \
 		   ./scripts/fetch-contract-address.sh \
 		   ./scripts/create-policy.sh \
 		   ./scripts/detail-policy.sh \
-		   ./scripts/mileage/deploy-insurance.sh \
-		   ./scripts/usage/deploy-insurance.sh \
+		   ./scripts/mileage/deploy-contract.sh \
+		   ./scripts/mileage/deploy-default-contract.sh \
+		   ./scripts/mileage/create-policy.sh \
+		   ./scripts/usage/deploy-contract.sh \
+		   ./scripts/usage/deploy-default-contract.sh \
+		   ./scripts/usage/create-policy.sh \
 		   ./scripts/traditional/create-policy.sh \
 		   ./scripts/traditional/create-default-policy.sh \
 		   ./scripts/traditional/deploy-contract.sh \
@@ -25,6 +29,7 @@ SCRIPTS := ./scripts/compile-contract.sh \
 		   ./scripts/detail-motus.sh \
 		   ./scripts/list-policy.sh \
 		   ./scripts/init-default-contract.sh
+
 
 # Target to make all script files executable
 make-scripts-executable:
@@ -89,13 +94,29 @@ make-payment:
 
 
 ####################################
-## Traditional Insurance Contract ##
+## Deploy  Contracts ##
 
 deploy-default-contract:
 	./scripts/traditional/deploy-default-contract.sh $(Allianz)
 
+deploy_default_usage_contract:
+	./scripts/mileage/deploy-default-contract.sh $(Allianz)
+
+deploy_default_mileage_contract:
+	./scripts/mileage/deploy-default-contract.sh $(Allianz)
+
 deploy-contract:
 	./scripts/traditional/deploy-contract.sh
+
+deploy-usage:
+	./scripts/usage/deploy-contract.sh 
+
+deploy-mileage:
+	./scripts/mileage/deploy-contract.sh 
+
+
+####################################
+## Initiate  Contracts ##
 
 # This script initiates various types of contracts.
 # Ensure to update the $(CODE) variable with the address of the latest deployed contract.
@@ -105,6 +126,8 @@ init-default-contract:
 init-contract:
 	./scripts/init-contract.sh
 
+################################
+## Create Contract ##
 
 # This script initiates traditional types of contracts.
 # Ensure to update the $(CONTRACT_ADDRESS) & $(POLICY_ID) variables with the id and the address of the latest deployed contract.
@@ -113,6 +136,17 @@ create-default-policy:
 
 create-policy:
 	./scripts/traditional/create-policy.sh
+
+create-usage:
+	./scripts/usage/create-policy.sh
+
+create-mileage:
+	./scripts/mileage/create-policy.sh
+
+
+##################################
+## Fetch Contract ##
+
 
 fetch-default-contract-address:
 	./scripts/fetch-default-contract-address.sh $(CODE)
@@ -141,25 +175,19 @@ renew-policy:
 	./scripts/renew-policy.sh
 
 
-################################
-## Usage Based Smart Contract ##
-
-deploy_usage_based_insurance:
-	./scripts/mileage/deploy-insurance.sh $(Allianz)
-
-create-usage-based-policy:
-	./scripts/usage/create-policy.sh $(CODE)
 
 
-##################################
-## Mileage Based Smart Contract ##
 
 
-deploy_mileage_based_insurance:
-	./scripts/mileage/deploy-insurance.sh $(Allianz)
 
-create-mileage-based-policy:
-	./scripts/mileage/create-policy.sh $(CODE)
+
+
+
+
+
+
+
+
 
 
 # This script initiates usage_based & mileage_based types of contracts.

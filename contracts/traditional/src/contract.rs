@@ -132,14 +132,14 @@ pub fn execute(
 ) -> Result<Response, ContractError> {
 
     match msg {
-        ExecuteMsg::CreateLiabilityPolicy(msg) => create_liability_policy(deps, env, msg, info),
+        ExecuteMsg::CreateLiabilityPolicy(msg) => create_policy(deps, env, msg, info),
         ExecuteMsg::Withdraw(msg)  => execute_withdraw_premium(deps, env, info, msg),
         ExecuteMsg::Renewal(msg) => execute_renewal(deps, env, info, msg),
         ExecuteMsg::Terminate(msg) => execute_terminate(deps, env, info, msg),
     }
 }
 
-pub fn create_liability_policy(
+pub fn create_policy(
     deps: DepsMut<SoarchainQuery>,
     env: Env,
     msg: LiabilityPolicyInputs,
@@ -193,7 +193,7 @@ pub fn create_liability_policy(
 
     let premium = calculate_premium(risk, msg.driving_history.clone(), msg.vehicle_type, msg.liability_limit, msg.deductible_amount);
 
-    let policy_id = create_policy_id(&msg.insurer, &msg.insurer, env.block.time.seconds());
+    let policy_id = create_policy_id(&msg.insurer, &msg.insured_party, env.block.time.seconds());
 
   
     // **TODO: Insert your specific business logic calculations in this section.**
