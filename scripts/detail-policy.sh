@@ -11,3 +11,4 @@ read contract
 $CHAIN query wasm contract-state smart $contract '{"details":{"address":"'"$($CHAIN keys show -a $account)"'"}}' \
     --node $NODE \
     --chain-id $CHAINID 
+

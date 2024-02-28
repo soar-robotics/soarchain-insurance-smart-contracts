@@ -52,3 +52,21 @@ pub struct VehicleInfo {
     pub fuel_rate: u64,
     pub odometer: u64
 }
+
+#[cw_serde]
+pub struct VinInfo {
+    pub region: String,
+    pub car_type: String,
+    pub make: String,
+    pub manufacture: String,
+    pub model:String,
+    pub model_year: String, 
+    pub body_style: String,
+    pub series: u64,
+    pub cylinders: u64,
+    pub engin_model: String,
+    pub engin_break: u64,
+    pub production_number: u64,
+    pub fuel_supply_system: String,
+    pub driving_type: String
+}

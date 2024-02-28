@@ -8,6 +8,7 @@ pub enum SoarchainQuery {
     #[returns(MotusByAddressResponse)]
     MotusByAddress {
         address: String,
+        dpr: String,
     },
 
     #[returns(PaymentVerificationResponse)]
@@ -22,8 +23,10 @@ impl SoarchainQuery {
 #[cw_serde]
 pub struct MotusByAddressResponse {
     pub address: String,
+    pub dpr_id: String,
     pub pubkey: String,
     pub vin: String,
+    pub dpr: String,
     pub pid: Pid,
 }
 

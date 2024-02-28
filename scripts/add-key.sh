@@ -1,8 +1,13 @@
 #!/bin/bash
 
-echo "We are going to create an account for you:"
+echo "-------------------------------"
+echo "We are going to create accounts"
+echo "-------------------------------"
+
+
 echo "Enter your account name:"
 read account
+
 echo "Enter your mnemonic:"
 read mnemonic
 

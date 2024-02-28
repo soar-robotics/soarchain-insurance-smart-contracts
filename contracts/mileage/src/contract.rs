@@ -57,7 +57,7 @@ pub fn execute(
     msg: ExecuteMsg,
 ) -> Result<Response, ContractError> {
     match msg {
-        ExecuteMsg::CreatePolicy(msg) => create_policy(deps, env, msg, info ),
+        ExecuteMsg::CreateMileagePolicy(msg) => create_policy(deps, env, msg, info ),
         ExecuteMsg::Withdraw(msg)  => execute_withdraw(deps, env, info, msg),
         ExecuteMsg::Renewal(msg) => execute_renewal(deps, env, info, msg),
         ExecuteMsg::Terminate(msg) => execute_terminate(deps, env, info, msg),

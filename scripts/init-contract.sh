@@ -1,8 +1,12 @@
 #!/bin/sh
 
-echo "We are going to create an account for you:"
+echo "-------------------------------------------"
+echo "We are going to initiate a contract for you"
+echo "-------------------------------------------"
+
 echo "Enter insurer account name:"
 read account
+
 echo "Enter contract code:"
 read code
 
