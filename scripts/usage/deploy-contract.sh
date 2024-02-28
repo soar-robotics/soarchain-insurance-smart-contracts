@@ -1,6 +1,8 @@
 #!/bin/sh
-
+echo "-------------------------------------------"
 echo "We are going to deploy a contract for you:"
+echo "-------------------------------------------"
+
 echo "Enter insurer account name:"
 read account
 

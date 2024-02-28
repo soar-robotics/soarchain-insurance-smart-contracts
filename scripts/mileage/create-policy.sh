@@ -18,7 +18,7 @@ echo "Enter deductible amount:"
 read deductible
 
 EXECUTE_CREATE_POLICY='{
-  "create_policy": {
+  "create_mileage_policy": {
     "insurer": "'"$($CHAIN keys show -a $account)"'",
     "insured_party": "'"$($CHAIN keys show -a $party)"'",
     "duration": '"$duration"',

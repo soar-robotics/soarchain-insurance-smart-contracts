@@ -17,9 +17,11 @@ impl<'a> SoarchainQuerier<'a> {
     pub fn motus_by_address(
         &self,
         address: String,
+        dpr: String,
     ) -> StdResult<MotusByAddressResponse> {
         let motus_by_address_query = SoarchainQuery::MotusByAddress {
             address,
+            dpr,
         };
         let request: QueryRequest<SoarchainQuery> = SoarchainQuery::into(motus_by_address_query);
         self.querier.query(&request)

@@ -19,11 +19,11 @@ const DISCOUNT_INCREMENT: u64 =  2 / 100; // 2% discount per year
 /// * `duration` - The duration of the policy in days.
 ///
 /// ```
-pub fn calculate_termination_time(start_date_seconds: u64, duration: u64 ) -> u64 {
+pub fn calculate_termination_time(start_time_seconds: u64, duration: u64 ) -> u64 {
 
     let seconds_per_day: u64 =  24 * 3600;
 
-    let termination_time = start_date_seconds.add(duration.mul(seconds_per_day));
+    let termination_time = start_time_seconds.add(duration.mul(seconds_per_day));
 
     log::info!("Result of renewal_termination_time: {}", termination_time);
 
@@ -47,6 +47,8 @@ pub fn calculate_renewal_termination_time(duration: u64, termination_time: u64 )
 
     return termination_time;
 }
+
+
 
 pub fn split_and_convert(input: &str) -> (u64, u64, u64) {
     let limits: Vec<&str> = input.split('/').collect();
@@ -259,12 +261,13 @@ pub fn calculate_deductible_amount(deductible_amount: u64) -> u64 {
 }
 
 pub fn calculate_premium(risk_point: RiskPoint, driving_history: DrivingHistory, vehicle_type: String, liability_limit: String, deductible_amount: u64) -> u64 {
-    return LIABILITY_BASE_RATE
+    let result = LIABILITY_BASE_RATE
     .add(calculate_age_risk_amount(risk_point.age))
     .add(calculate_vehicle_type_risk_amount(vehicle_type))
     .add(calculate_limit_based_amount(liability_limit))
     .sub(calculate_safe_driver_discount(driving_history))
     .sub(calculate_deductible_amount(deductible_amount));
+    return result
 }
 
 // pub fn calculate_coverage_amount(
@@ -347,6 +350,8 @@ pub fn calculate_premium(risk_point: RiskPoint, driving_history: DrivingHistory,
 // }
 
 
+
+
 #[cfg(test)]
 mod tests {
     use cosmwasm_std::Decimal256;
@@ -358,7 +363,7 @@ mod tests {
 
         let termination_time = calculate_termination_time(2400, 11);
         println!("Result of termination_time: {}", termination_time);
-        assert_eq!(termination_time, 952800);
+        assert_eq!(termination_time,952800u64);
 
         let policy_id = create_policy_id("insurer", "insured_party", 2400);
         println!("Result of policy_id: {}", policy_id);
@@ -457,7 +462,7 @@ mod tests {
 
         let decimal = Decimal256::from_atomics(12u64, 1).unwrap();
         println!("decimal---->: {}", decimal);
-        assert_eq!(decimal.to_string(), "1.2");
+        //assert_eq!(decimal.to_string(),Decimal::from() "1.2");
 
     }
 

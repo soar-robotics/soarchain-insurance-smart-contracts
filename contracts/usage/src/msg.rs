@@ -2,7 +2,7 @@ use cosmwasm_schema::{cw_serde, QueryResponses};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use crate::query::Pid;
-use crate::types::Data;
+use crate::types::{Data, VinInfo};
 
 #[cw_serde]
 pub struct InstantiateMsg {
@@ -13,7 +13,7 @@ pub struct InstantiateMsg {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ExecuteMsg {
-    CreatePolicy(CreateMsg),
+    CreateUsageBasedPolicy(CreateMsg),
     Withdraw(WithdrawMsg),
     Renewal(RenewalMsg),
     Terminate(TerminateMsg),
@@ -43,6 +43,8 @@ pub struct CreateMsg {
     pub duration: u64,
     pub document_hash: String,
     pub deductible_amount: u64,
+    pub dpr: String,
+    pub vin_info: VinInfo,
     pub vehicle_data: Vec<Data>
 }
 
@@ -50,7 +52,7 @@ pub struct CreateMsg {
 #[derive(QueryResponses)]
 pub enum QueryMsg {
     #[returns(MotusByAddressResponse)]
-    MotusByAddress { address: String },
+    MotusByAddress { address: String, dpr: String },
 
     #[returns(PaymentVerificationResponse)]
     PaymentVerification { id: String },
@@ -66,9 +68,11 @@ pub enum QueryMsg {
 #[cw_serde]
 pub struct MotusByAddressResponse {
     pub address: String,
+    pub dpr_id: String,
     pub pubkey: String,
     pub vin: String,
-    pub pid: Pid
+    pub dpr: String,
+    pub pid: Pid,
 }
 
 #[derive(Serialize, Deserialize, Clone, PartialEq, JsonSchema, Debug)]

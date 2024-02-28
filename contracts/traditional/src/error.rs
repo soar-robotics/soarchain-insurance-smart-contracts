@@ -44,4 +44,5 @@ pub enum ContractError {
 
     #[error("Ploicy is not eligible for renewal.")]
     NotEligibleForRenewal {},
+
 }

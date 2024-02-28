@@ -40,4 +40,7 @@ pub enum ContractError {
     #[error("Ploicy is not eligible for renewal.")]
     NotEligibleForRenewal {},
 
+    #[error("Insured party did not entered to a dpr.")]
+    NoDprForInsuredParty {},
+
 }

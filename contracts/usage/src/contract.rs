@@ -54,7 +54,7 @@ pub fn execute(
     msg: ExecuteMsg,
 ) -> Result<Response, ContractError> {
     match msg {
-        ExecuteMsg::CreatePolicy(msg) => create_policy(deps, env, msg, info ),
+        ExecuteMsg::CreateUsageBasedPolicy(msg) => create_policy(deps, env, msg, info ),
         ExecuteMsg::Withdraw(msg)  => execute_withdraw(deps, env, info, msg),
         ExecuteMsg::Renewal(msg) => execute_renewal(deps, env, info, msg),
         ExecuteMsg::Terminate(msg) => execute_terminate(deps, env, info, msg),
@@ -68,7 +68,7 @@ pub fn create_policy(
     info: MessageInfo,
 ) -> Result<Response, ContractError> {
   
-    let insured = msg.insured_party.to_string();
+    //let insured = msg.insured_party.to_string();
 
     // Ensure that the sender is the owner of the contract
     let insurer = deps.api.addr_validate(&msg.insurer.to_string())?;
@@ -80,9 +80,13 @@ pub fn create_policy(
 
     // Verify that the insured party is registered as a motus client within the blockchain.
     let querier = SoarchainQuerier::new(&deps.querier);
-    let response = querier.motus_by_address(insured).unwrap();
-    if response.address != msg.insured_party {
+    let response = querier.motus_by_address(msg.insured_party.to_string(), msg.dpr.to_string()).unwrap();
+    if response.address.to_string() != msg.insured_party.to_string() {
         return Err(ContractError::UnauthorizedInsuredParty {});
+    }
+
+    if response.pubkey.to_string() ==  "".to_string() {
+        return Err(ContractError::NoDprForInsuredParty {});
     }
 
     if msg.vehicle_data.len() < 2 {
@@ -149,9 +153,11 @@ pub fn execute_withdraw(
         return Err(ContractError::Unauthorized {});
     }
 
+    let dpr = "0c2b8f6048fd93d9e446d70393e4a6793030b767c5c5e217af7c984889238af8";
+
     // Ensure that the insured oarty is the motus owner
     let querier = SoarchainQuerier::new(&deps.querier);
-    let response = querier.motus_by_address(msg.insured_party.to_string()).unwrap();
+    let response = querier.motus_by_address(msg.insured_party.to_string(), dpr.to_string()).unwrap();
     if response.address != msg.insured_party.to_string() {
         return Err(ContractError::UnauthorizedInsuredParty{});
     }
@@ -207,9 +213,11 @@ pub fn execute_renewal(
         return Err(ContractError::Unauthorized {});
     }
 
+    let dpr = "0c2b8f6048fd93d9e446d70393e4a6793030b767c5c5e217af7c984889238af8";
+
     // Ensure that the insured oarty is the motus owner
     let querier = SoarchainQuerier::new(&deps.querier);
-    let response = querier.motus_by_address(msg.insured_party.to_string()).unwrap();
+    let response = querier.motus_by_address(msg.insured_party.to_string(), dpr.to_string()).unwrap();
     if response.address != msg.insured_party.to_string() {
         return Err(ContractError::UnauthorizedInsuredParty {});
     }
@@ -285,9 +293,11 @@ pub fn execute_terminate(
         return Err(ContractError::Unauthorized {});
     }
 
+    let dpr = "0c2b8f6048fd93d9e446d70393e4a6793030b767c5c5e217af7c984889238af8";
+
     // Ensure that the insured oarty is the motus owner
     let querier = SoarchainQuerier::new(&deps.querier);
-    let response = querier.motus_by_address(msg.insured_party.to_string()).unwrap();
+    let response = querier.motus_by_address(msg.insured_party.to_string(), dpr.to_string()).unwrap();
     if response.address != msg.insured_party.to_string() {
         return Err(ContractError::UnauthorizedInsuredParty {});
     }
@@ -324,23 +334,25 @@ pub fn execute_terminate(
 pub fn query(deps: Deps<SoarchainQuery>, env: Env, msg: QueryMsg) -> StdResult<Binary> {
 
     match msg { 
-        QueryMsg::MotusByAddress { address, } => to_json_binary(&get_motus_by_address(deps, address)), 
+        QueryMsg::MotusByAddress { address, dpr} => to_json_binary(&get_motus_by_address(deps, address, dpr)), 
         QueryMsg::PaymentVerification { id } => to_json_binary(&payment_verified(deps, env, id)?),
         QueryMsg::Details { address } => to_json_binary(&query_details(deps, address)?),
         QueryMsg::List {} => to_json_binary(&query_list(deps)?),
     }
 }
 
-fn get_motus_by_address(deps: Deps<SoarchainQuery>, index: String) -> MotusByAddressResponse {
+fn get_motus_by_address(deps: Deps<SoarchainQuery>, index: String, dpr: String) -> MotusByAddressResponse {
     info!("contract-insurance-get_motus_by_address: address {}  Mb/s", index);
     let querier = SoarchainQuerier::new(&deps.querier);
-    let response = querier.motus_by_address(index).unwrap();
+    let response: crate::MotusByAddressResponse = querier.motus_by_address(index, dpr).unwrap();
     info!("contract-insurance-get_motus_by_address: response {}  Mb/s", response.address);
 
     MotusByAddressResponse {
         address: response.address,
+        dpr_id: response.dpr_id,
         pubkey: response.pubkey,
         vin: response.vin,
+        dpr: response.dpr.to_string(),
         pid: response.pid,
     }
 }
@@ -364,7 +376,7 @@ fn query_details(deps: Deps<SoarchainQuery>, id: String) -> StdResult<DetailsRes
         insurer: policy.insurer,
         insured_party: policy.insured_party,
         start_time: policy.start_time,
-         premium: policy.premium,
+        premium: policy.premium,
         duration: policy.duration,
         termination_time: policy.termination_time,
         is_active: policy.is_active,

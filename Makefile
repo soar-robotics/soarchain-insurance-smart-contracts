@@ -123,7 +123,7 @@ deploy-mileage:
 init-default-contract:
 	./scripts/init-default-contract.sh $(CODE) $(Allianz)
 
-init-contract:
+init:
 	./scripts/init-contract.sh
 
 ################################
@@ -205,5 +205,5 @@ terminate-policy:
 ##############################
 ## Pre-Deploy Configuration ##
 
-compile-contract:
+compile:
 	./scripts/compile-contract.sh

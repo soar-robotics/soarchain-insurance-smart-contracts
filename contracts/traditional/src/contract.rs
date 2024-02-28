@@ -36,9 +36,7 @@ use crate::liabilitypolicy::LiabilityPolicy;
 use crate::state::{all_policy_insured_parties, State, POLICES, STATE};
 use crate::querier::SoarchainQuerier;
 use crate::query::SoarchainQuery;
-use cosmwasm_std::{
-    coin, to_json_binary, BankMsg, Binary, StdResult
-};
+use cosmwasm_std::{coin, to_json_binary, BankMsg, Binary, StdResult};
 use crate::utility::{
     calculate_premium, 
     calculate_renewal_termination_time, 
@@ -214,8 +212,8 @@ pub fn create_policy(
         terms,
         risk_points,
         premium,
-        LIABILITY_BASE_RATE,
-        msg.duration,
+        LIABILITY_BASE_RATE.into(),
+        msg.duration.into(),
         termination_time,
 false,
         false,
@@ -251,7 +249,7 @@ pub fn execute_withdraw_premium(
         return Err(ContractError::UnauthorizedInsuredParty{});
     }
 
-    let withdraw_amount: u128 = policy.premium as u128;
+    let withdraw_amount: u128 = u128::from(policy.premium);
     let balance = deps.querier.query_balance(env.contract.address.to_string(), state.denom.to_string())?;
 
     // Ensure the sender has enough funds to transfer
@@ -352,7 +350,7 @@ pub fn execute_renewal(
 
             // Modify the existing policy fields as needed...
 
-            res.premium = msg.premium;
+            res.premium = msg.premium.into();
             res.duration = msg.duration;
             res.termination_time = termination_time;
             res.is_active = false;
@@ -420,7 +418,6 @@ pub fn execute_terminate(
         .add_attribute("action", "terminate");
     Ok(res)
 }
-
 
 
 /// The `query` function handles queries to the smart contract.
