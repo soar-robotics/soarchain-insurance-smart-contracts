@@ -1,5 +1,3 @@
-# Makefile to make script files executable
-
 # List of script files to make executable
 SCRIPTS := ./scripts/compile-contract.sh \
 		   ./scripts/start-node.sh \
@@ -173,21 +171,6 @@ withdraw-premium:
 
 renew-policy:
 	./scripts/renew-policy.sh
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # This script initiates usage_based & mileage_based types of contracts.
