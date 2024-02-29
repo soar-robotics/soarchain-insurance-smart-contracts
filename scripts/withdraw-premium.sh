@@ -1,15 +1,23 @@
 #!/bin/sh
 
+echo "---------------------------------"
 echo "We are going to withdraw premium:"
+echo "---------------------------------"
+
 echo "Enter insured party account name:"
 read account
+
 echo "Enter contract address:"
 read contract
 
-WITHDRAW_DATA='{"withdraw":{"insured_party": "'"$($CHAIN keys show -a $account)"'"}}'
+echo "Enter dpr id:"
+read dpr
 
 
-$CHAIN tx bank send $($CHAIN keys show -a $account) $contract 1000000$DENOM \
+WITHDRAW_DATA='{"withdraw":{"insured_party": "'"$($CHAIN keys show -a $account)"'", "dpr":"'"$dpr"'"}}'
+
+
+$CHAIN tx bank send "soar1qt8myp9424ng6rv4fwf65u9a0ttfschw5j4sp8" $contract 8000000000$DENOM \
     --chain-id $CHAINID \
     --node $NODE \
     --gas-prices 0.1$DENOM \
