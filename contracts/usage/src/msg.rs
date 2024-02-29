@@ -22,6 +22,7 @@ pub enum ExecuteMsg {
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct WithdrawMsg {
     pub insured_party: String,
+    pub dpr: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
@@ -29,11 +30,13 @@ pub struct RenewalMsg {
     pub premium: u64,
     pub duration: u64,
     pub insured_party: String,
+    pub dpr: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
 pub struct TerminateMsg {
     pub insured_party: String,
+    pub dpr: String,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, JsonSchema)]
