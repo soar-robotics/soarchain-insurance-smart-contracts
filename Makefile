@@ -166,7 +166,7 @@ list-Default-policy:
 list-policy:
 	./scripts/list-policy.sh
 
-withdraw-premium:
+withdraw:
 	./scripts/withdraw-premium.sh
 
 renew-policy:
@@ -181,7 +181,7 @@ create-UBI-policy:
 	./scripts/create-policy.sh $(UBI_CONTRACT_ADDRESS) $(UBI_POLICY_ID)
 
 
-terminate-policy:
+terminate:
 	./scripts/terminate-policy.sh $(Bob) $(Insurance_CONTRACT_ADDRESS)
 
 
