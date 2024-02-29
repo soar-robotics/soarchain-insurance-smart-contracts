@@ -1,5 +1,5 @@
 use cosmwasm_schema::{cw_serde, QueryResponses};
-use cosmwasm_std::{CustomQuery, Uint128};
+use cosmwasm_std::CustomQuery;
 
 use crate::liabilitypolicy::LiabilityPolicy;
 
@@ -55,12 +55,12 @@ pub struct DetailsResponse {
     pub insurer: String,
     pub insured_party: String,
     pub document_hash: String,
-    pub start_time: Uint128,
+    pub start_time: String,
     pub terms: String,
     pub risk_point: String,
     pub premium: u64,
     pub duration: u64,
-    pub termination_time: u64,
+    pub termination_time: String,
     pub is_active: bool,
     pub closed: bool,
 }
