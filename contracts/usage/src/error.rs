@@ -43,4 +43,7 @@ pub enum ContractError {
     #[error("Insured party did not entered to a dpr.")]
     NoDprForInsuredParty {},
 
+    #[error("Calculated premium can not be less that the base rate.")]
+    LessPremium {},
+    
 }

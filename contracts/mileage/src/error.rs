@@ -39,5 +39,6 @@ pub enum ContractError {
     #[error("Ploicy is not eligible for renewal.")]
     NotEligibleForRenewal {},
 
-
+    #[error("Calculated premium can not be less that the base rate.")]
+    LessPremium {},
 }
