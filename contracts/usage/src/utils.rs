@@ -2,7 +2,7 @@ use std::ops::{Add, Mul};
 use crate::types::Data;
 use sha3::{Digest, Sha3_256};
 
-const BASE_RATE: u64 = 1000;
+pub const BASE_RATE: u64 = 1000;
 
 pub fn calculate_avg_vss(data: &[Data]) -> u64 {
     let mut sum: u64 = 0;
