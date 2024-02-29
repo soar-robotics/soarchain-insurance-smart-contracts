@@ -15,12 +15,11 @@ use crate::query::SoarchainQuery;
 use cosmwasm_std::{
     coin, to_json_binary, BankMsg, Binary, StdResult
 };
-use crate::utils::{calculate_avg_rpm, calculate_avg_vss, calculate_renewal_termination_time, calculate_termination_time, create_policy_id, is_policy_eligible_for_renewal};
+use crate::utils::{calculate_premium, calculate_renewal_termination_time, calculate_termination_time, create_policy_id, is_policy_eligible_for_renewal};
 
 // Version info for migration
 const CONTRACT_NAME: &str = "crates.io:usage-based-insurance-contract";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
-const BASE_RATE: u64 = 1000;
 
 #[cfg_attr(not(feature = "library"), entry_point)]
 pub fn instantiate(
@@ -68,8 +67,6 @@ pub fn create_policy(
     info: MessageInfo,
 ) -> Result<Response, ContractError> {
   
-    //let insured = msg.insured_party.to_string();
-
     // Ensure that the sender is the owner of the contract
     let insurer = deps.api.addr_validate(&msg.insurer.to_string())?;
     let sender = deps.api.addr_validate(&info.sender.to_string())?;
@@ -107,23 +104,23 @@ pub fn create_policy(
     let policy_id = create_policy_id(&msg.insurer, &msg.insured_party, env.block.time.seconds());
 
     let termination_time = calculate_termination_time(env.block.time.seconds(), msg.duration);
-    let mut premium = 0;
 
-    let avg_vss = calculate_avg_vss(&msg.vehicle_data);
-    let avg_rpm = calculate_avg_rpm(&msg.vehicle_data);
+    // let avg_vss = calculate_avg_vss(&msg.vehicle_data);
+    // let avg_rpm = calculate_avg_rpm(&msg.vehicle_data);
+    // let mut premium = 0;
 
-    if avg_vss < 80 &&  avg_rpm < 2500 {
-        premium = premium / 2
-    } else {
-        premium = BASE_RATE.mul(2);
-    }
+    // if avg_vss < 80 &&  avg_rpm < 2500 {
+    //     premium = BASE_RATE / 2
+    // } else {
+    //     premium = BASE_RATE.mul(2);
+    // }
 
     let policy = Policy::create(
         policy_id.to_string(),
         msg.insurer.to_string(),
         response.address.to_string(),
         env.block.time.seconds(),
-        premium,
+        calculate_premium(&msg.vehicle_data),
         msg.duration,
         termination_time,
         false,
@@ -153,13 +150,15 @@ pub fn execute_withdraw(
         return Err(ContractError::Unauthorized {});
     }
 
-    let dpr = "0c2b8f6048fd93d9e446d70393e4a6793030b767c5c5e217af7c984889238af8";
-
     // Ensure that the insured oarty is the motus owner
     let querier = SoarchainQuerier::new(&deps.querier);
-    let response = querier.motus_by_address(msg.insured_party.to_string(), dpr.to_string()).unwrap();
+    let response = querier.motus_by_address(msg.insured_party.to_string(), msg.dpr.to_string()).unwrap();
     if response.address != msg.insured_party.to_string() {
         return Err(ContractError::UnauthorizedInsuredParty{});
+    }
+
+    if response.pubkey.to_string() ==  "".to_string() {
+        return Err(ContractError::NoDprForInsuredParty {});
     }
 
     let withdraw_amount: u128 = policy.premium as u128;
@@ -213,13 +212,15 @@ pub fn execute_renewal(
         return Err(ContractError::Unauthorized {});
     }
 
-    let dpr = "0c2b8f6048fd93d9e446d70393e4a6793030b767c5c5e217af7c984889238af8";
-
     // Ensure that the insured oarty is the motus owner
     let querier = SoarchainQuerier::new(&deps.querier);
-    let response = querier.motus_by_address(msg.insured_party.to_string(), dpr.to_string()).unwrap();
+    let response = querier.motus_by_address(msg.insured_party.to_string(), msg.dpr.to_string()).unwrap();
     if response.address != msg.insured_party.to_string() {
         return Err(ContractError::UnauthorizedInsuredParty {});
+    }
+
+    if response.pubkey.to_string() ==  "".to_string() {
+        return Err(ContractError::NoDprForInsuredParty {});
     }
 
     let renewal_premium: u128 = msg.premium as u128;
@@ -293,13 +294,15 @@ pub fn execute_terminate(
         return Err(ContractError::Unauthorized {});
     }
 
-    let dpr = "0c2b8f6048fd93d9e446d70393e4a6793030b767c5c5e217af7c984889238af8";
-
     // Ensure that the insured oarty is the motus owner
     let querier = SoarchainQuerier::new(&deps.querier);
-    let response = querier.motus_by_address(msg.insured_party.to_string(), dpr.to_string()).unwrap();
+    let response = querier.motus_by_address(msg.insured_party.to_string(), msg.dpr.to_string()).unwrap();
     if response.address != msg.insured_party.to_string() {
         return Err(ContractError::UnauthorizedInsuredParty {});
+    }
+
+    if response.pubkey.to_string() ==  "".to_string() {
+        return Err(ContractError::NoDprForInsuredParty {});
     }
 
     // **TODO: Insert your specific business logic calculations in this section.**
