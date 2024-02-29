@@ -15,8 +15,7 @@ use crate::query::SoarchainQuery;
 use cosmwasm_std::{
     coin, to_json_binary, BankMsg, Binary, StdResult
 };
-use crate::utils::{calculate_premium, calculate_renewal_termination_time, calculate_termination_time, create_policy_id, is_policy_eligible_for_renewal};
-
+use crate::utils::{BASE_RATE, calculate_premium, calculate_renewal_termination_time, calculate_termination_time, create_policy_id, is_policy_eligible_for_renewal};
 // Version info for migration
 const CONTRACT_NAME: &str = "crates.io:usage-based-insurance-contract";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
@@ -82,7 +81,7 @@ pub fn create_policy(
         return Err(ContractError::UnauthorizedInsuredParty {});
     }
 
-    if response.pubkey.to_string() ==  "".to_string() {
+    if response.dpr_id.to_string() ==  "".to_string() {
         return Err(ContractError::NoDprForInsuredParty {});
     }
 
@@ -105,22 +104,18 @@ pub fn create_policy(
 
     let termination_time = calculate_termination_time(env.block.time.seconds(), msg.duration);
 
-    // let avg_vss = calculate_avg_vss(&msg.vehicle_data);
-    // let avg_rpm = calculate_avg_rpm(&msg.vehicle_data);
-    // let mut premium = 0;
+    let premium = calculate_premium(&msg.vehicle_data);
 
-    // if avg_vss < 80 &&  avg_rpm < 2500 {
-    //     premium = BASE_RATE / 2
-    // } else {
-    //     premium = BASE_RATE.mul(2);
-    // }
-
+    if premium < BASE_RATE {
+        return Err(ContractError::LessPremium {});
+    }
+    
     let policy = Policy::create(
         policy_id.to_string(),
         msg.insurer.to_string(),
         response.address.to_string(),
         env.block.time.seconds(),
-        calculate_premium(&msg.vehicle_data),
+        premium,
         msg.duration,
         termination_time,
         false,
@@ -157,7 +152,7 @@ pub fn execute_withdraw(
         return Err(ContractError::UnauthorizedInsuredParty{});
     }
 
-    if response.pubkey.to_string() ==  "".to_string() {
+    if response.dpr_id.to_string() ==  "".to_string() {
         return Err(ContractError::NoDprForInsuredParty {});
     }
 
@@ -219,7 +214,7 @@ pub fn execute_renewal(
         return Err(ContractError::UnauthorizedInsuredParty {});
     }
 
-    if response.pubkey.to_string() ==  "".to_string() {
+    if response.dpr_id.to_string() ==  "".to_string() {
         return Err(ContractError::NoDprForInsuredParty {});
     }
 
@@ -301,7 +296,7 @@ pub fn execute_terminate(
         return Err(ContractError::UnauthorizedInsuredParty {});
     }
 
-    if response.pubkey.to_string() ==  "".to_string() {
+    if response.dpr_id.to_string() ==  "".to_string() {
         return Err(ContractError::NoDprForInsuredParty {});
     }
 
@@ -348,14 +343,12 @@ fn get_motus_by_address(deps: Deps<SoarchainQuery>, index: String, dpr: String) 
     info!("contract-insurance-get_motus_by_address: address {}  Mb/s", index);
     let querier = SoarchainQuerier::new(&deps.querier);
     let response: crate::MotusByAddressResponse = querier.motus_by_address(index, dpr).unwrap();
-    info!("contract-insurance-get_motus_by_address: response {}  Mb/s", response.address);
 
     MotusByAddressResponse {
         address: response.address,
         dpr_id: response.dpr_id,
         pubkey: response.pubkey,
         vin: response.vin,
-        dpr: response.dpr.to_string(),
         pid: response.pid,
     }
 }
@@ -378,10 +371,10 @@ fn query_details(deps: Deps<SoarchainQuery>, id: String) -> StdResult<DetailsRes
         id,
         insurer: policy.insurer,
         insured_party: policy.insured_party,
-        start_time: policy.start_time,
+        start_time: policy.start_time.to_string(),
         premium: policy.premium,
         duration: policy.duration,
-        termination_time: policy.termination_time,
+        termination_time: policy.termination_time.to_string(),
         is_active: policy.is_active,
         closed: policy.closed,
     };
@@ -394,3 +387,4 @@ fn query_list(deps: Deps<SoarchainQuery>) -> StdResult<ListResponse> {
         insured_parties: all_policy_insured_parties(deps.storage)?,
     })
 }
+
