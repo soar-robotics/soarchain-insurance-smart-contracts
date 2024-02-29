@@ -1,5 +1,4 @@
 
-// use crate::types::Data;
 use std::ops::{Add, Mul};
 use sha3::{Digest, Sha3_256};
 use crate::types::Data;
@@ -8,14 +7,6 @@ pub fn calculate_mileage(data: &[Data]) -> u64 {
 
     let mut mileage: u64 = 0;
 
-    // let data_str1 = r#"[
-    //     {"data_info":{"data_details": {"accelerometer":{"x": 12, "y": 32, "z": 67}, "gyroscope":{"x": 12, "y": 32, "z": 67},"magnetometer":{"x": 12, "y": 32, "z": 67}, "location":{"lat": 12, "lng": 32}, "trip":"germany", "contract": "kjh","vehicle_info":{"load_pct": 12, "temp": 32, "rpm": 67, "vss": 44, "iat": 44, "maf": 55, "throttlepo": 4, "runtm": 8, "fli": 88, "baro": 8, "load_abs": 7, "fuel_rate": 99, "odometer": 1}}},"sign": "342342","pubkey": "1"}
-    //     ,
-    //     {"data_info":{"data_details": {"accelerometer":{"x": 12, "y": 32, "z": 67}, "gyroscope":{"x": 12, "y": 32, "z": 67},"magnetometer":{"x": 12, "y": 32, "z": 67}, "location":{"lat": 12, "lng": 32}, "trip":"germany", "contract": "kjh","vehicle_info":{"load_pct": 12, "temp": 32, "rpm": 67, "vss": 44, "iat": 44, "maf": 55, "throttlepo": 4, "runtm": 8, "fli": 88, "baro": 8, "load_abs": 7, "fuel_rate": 99, "odometer": 23}}},"sign": "342342","pubkey": "1"}]"#;
-
-    // //let data_str = r#"[{"data_info":{"data_details": {"accelerometer":{"x": 12, "y": 32, "z": 67}, "gyroscope":{"x": 12, "y": 32, "z": 67},"magnetometer":{"x": 12, "y": 32, "z": 67}, "location":{"lat": 12, "lng": 32}, "trip":"germany", "contract": "kjh","vehicle_info":{"load_pct": 12, "temp": 32, "rpm": 67, "vss": 44, "iat": 44, "maf": 55, "throttlepo": 4, "runtm": 8, "fli": 88, "baro": 8, "load_abs": 7, "fuel_rate": 99, "odometer": 1}}},"sign": "342342","pubkey": "1"},{"data_info":{"data_details": {"accelerometer":{"x": 12, "y": 32, "z": 67}, "gyroscope":{"x": 12, "y": 32, "z": 67},"magnetometer":{"x": 12, "y": 32, "z": 67}, "location":{"lat": 12, "lng": 32}, "trip":"germany", "contract": "kjh","vehicle_info":{"load_pct": 12, "temp": 32, "rpm": 67, "vss": 44, "iat": 44, "maf": 55, "throttlepo": 4, "runtm": 8, "fli": 88, "baro": 8, "load_abs": 7, "fuel_rate": 99, "odometer": 23}}},"sign": "342342","pubkey": "1"}]"#;
-    // let data: Vec<Data> = serde_json::from_str(data_str1).expect("Failed to deserialize JSON");
-    
     if let (Some(first), Some(last)) = (data.first(), data.last()) {
         let first: u64 = first.data_info.data_details.vehicle_info.odometer;
         let last: u64 = last.data_info.data_details.vehicle_info.odometer;
