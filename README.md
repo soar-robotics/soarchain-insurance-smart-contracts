@@ -115,7 +115,7 @@ make make-scripts-executable
 3) **Optional**: Allianz compiles all smart contracts only if the code has been modified; otherwise, there is no need to compile before proceeding to the 4th step
 
 ```bash
-make compile-contract
+make compile
 ```
 
 4) Allianz starts the SoarChain node
@@ -137,19 +137,19 @@ The account names mentioned in the scripts are utilized for testing token transa
 6) Allianz deploys the smart contract
 
 ```bash
-make deploy-contract
+make deploy-usage
 ```
 
 7) Allianz initiates the smart contract
 
 ```bash
-make init-contract
+make initiate
 ```
 
 8) Allianz generates a new insurance policy
 
 ```bash
-make create-policy
+make create-usage/create-policy/create-mileage
 ```
 
 9) Allianz and Bob check the insurance status and policy details
@@ -161,7 +161,7 @@ make detail-policy
 10) Bob completes the payment using cryptocurrency
 
 ```bash
-make withdraw-premium
+make withdraw
 ```
 
 11) Allianz reviews Bob's registration and vehicle information
