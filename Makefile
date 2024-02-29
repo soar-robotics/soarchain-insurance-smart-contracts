@@ -52,9 +52,9 @@ export CONTRACT_PATH="./artifacts/insurance.wasm"
 ############
 ## DEVNET ##
 ############
-# export NODE = http://164.92.252.231:26657
-# export CHAINID = soarchaintestnet
-# export DENOM = utmotus
+# export NODE = http://68.183.78.237:26657
+# export CHAINID = soarchaindevnet
+# export DENOM = udmotus
 # export CHAIN = soarchaind
 # export Allianz = allianz
 # export Bob = bob
@@ -121,7 +121,7 @@ deploy-mileage:
 init-default-contract:
 	./scripts/init-default-contract.sh $(CODE) $(Allianz)
 
-init:
+initiate:
 	./scripts/init-contract.sh
 
 ################################
