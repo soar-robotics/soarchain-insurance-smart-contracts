@@ -51,7 +51,7 @@ use crate::constants::LIABILITY_BASE_RATE;
 /// Version info for migration
 const CONTRACT_NAME: &str = "crates.io:traditional-insurance-contract";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
-
+const BASE_RATE: u64 = 1000;
 /// The instantiation entry point initializes the contract with the specified parameters.
 ///
 /// # Arguments
@@ -191,6 +191,10 @@ pub fn create_policy(
 
     let premium = calculate_premium(risk, msg.driving_history.clone(), msg.vehicle_type, msg.liability_limit, msg.deductible_amount);
 
+    if premium < BASE_RATE {
+        return Err(ContractError::LessPremium {});
+    }   
+   
     let policy_id = create_policy_id(&msg.insurer, &msg.insured_party, env.block.time.seconds());
 
   
@@ -482,12 +486,12 @@ fn query_details(deps: Deps<SoarchainQuery>, insured_address: String) -> StdResu
         insurer: policy.insurer,
         insured_party: policy.insured_party,
         document_hash: policy.document_hash,
-        start_time: policy.start_time,
+        start_time: policy.start_time.to_string(),
         terms: policy.terms,
         risk_point: policy.risk_point,
         premium: policy.premium,
         duration: policy.duration,
-        termination_time: policy.termination_time,
+        termination_time: policy.termination_time.to_string(),
         is_active: policy.is_active,
         closed: policy.closed
     };
