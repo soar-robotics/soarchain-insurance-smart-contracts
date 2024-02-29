@@ -137,7 +137,7 @@ The account names mentioned in the scripts are utilized for testing token transa
 6) Allianz deploys the smart contract
 
 ```bash
-make deploy-usage
+make deploy-usage/deploy-mileage/deploy-contract
 ```
 
 7) Allianz initiates the smart contract
