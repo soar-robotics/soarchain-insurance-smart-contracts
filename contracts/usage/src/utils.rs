@@ -2,6 +2,8 @@ use std::ops::{Add, Mul};
 use crate::types::Data;
 use sha3::{Digest, Sha3_256};
 
+const BASE_RATE: u64 = 1000;
+
 pub fn calculate_avg_vss(data: &[Data]) -> u64 {
     let mut sum: u64 = 0;
     for d in data {
@@ -64,6 +66,17 @@ pub fn calculate_renewal_termination_time(duration: u64, termination_time: u64 )
     log::info!("Result of renewal_termination_time: {}", termination_time);
 
     return termination_time;
+}
+
+pub fn calculate_premium(data: &[Data]) -> u64 {
+
+    let avg_vss = calculate_avg_vss(data);
+    let avg_rpm = calculate_avg_rpm(data);
+
+    if avg_vss < 80 &&  avg_rpm < 2500 {
+        return BASE_RATE / 2
+    } 
+    return BASE_RATE;
 }
 
 pub fn is_policy_eligible_for_renewal(
