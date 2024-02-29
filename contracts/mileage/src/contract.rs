@@ -20,7 +20,7 @@ use crate::utils::{calculate_mileage, calculate_renewal_termination_date, calcul
 // Version info for migration
 const CONTRACT_NAME: &str = "crates.io:mileage-contract";
 const CONTRACT_VERSION: &str = env!("CARGO_PKG_VERSION");
-
+const COVERAGE: &str = "5000";
 const BASE_RATE: u64 = 1000;
 const RATE_PER_MILEAGE: u64 = 2;
 
@@ -134,6 +134,10 @@ pub fn create_policy(
 
     let premium = BASE_RATE.mul(mileage.mul(RATE_PER_MILEAGE));
 
+    if premium < BASE_RATE {
+        return Err(ContractError::LessPremium {});
+    }
+
     let policy_id = create_policy_id(&msg.insurer, &msg.insured_party, env.block.time.seconds());
     let termination_time = calculate_termination_time(env.block.time.seconds(), msg.duration);
 
@@ -142,7 +146,7 @@ pub fn create_policy(
         msg.insurer.to_string(),
         response.address.to_string(),
         env.block.time.seconds(),
-        "5000".to_owned(),
+        COVERAGE.to_owned(),
         premium,
         msg.duration,
         termination_time,

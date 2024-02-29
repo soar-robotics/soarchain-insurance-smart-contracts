@@ -26,7 +26,6 @@ pub struct MotusByAddressResponse {
     pub dpr_id: String,
     pub pubkey: String,
     pub vin: String,
-    pub dpr: String,
     pub pid: Pid,
 }
 
@@ -51,11 +50,12 @@ pub struct PaymentVerificationResponse {
 #[cw_serde]
 pub struct DetailsResponse {
     pub id: String,
-    pub policy_holder: String,
+    pub insurer: String,
     pub insured_party: String,
-    pub start_time: u64,
+    pub start_time: String,
     pub premium: u64,
     pub duration: u64,
+    pub termination_time: String,
     pub is_active: bool,
     pub closed: bool,
 }
